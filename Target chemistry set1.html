@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chemistry Model Paper - Interactive</title>
+    <title>Chemistry Model Paper - Live Score & Admin View</title>
     <style>
         :root {
             --primary: #2c3e50;
@@ -141,11 +141,16 @@
             transform: scale(0.98);
         }
 
-        /* Results */
+        .btn-submit:disabled {
+            background-color: #95a5a6;
+            cursor: not-allowed;
+        }
+
+        /* Live Results Box */
         #results {
-            display: none;
+            display: block; /* Always visible */
             text-align: center;
-            font-size: 22px;
+            font-size: 20px;
             font-weight: bold;
             margin-top: 20px;
             padding: 20px;
@@ -200,10 +205,12 @@
             font-weight: bold;
         }
 
-        /* Section B */
+        /* Section B (Always Visible) */
         #section-b {
-            display: none;
+            display: block; /* Always visible */
             margin-top: 40px;
+            border-top: 2px dashed #ccc;
+            padding-top: 20px;
         }
 
         .ans-card {
@@ -318,15 +325,15 @@
         <!-- Questions injected via JS -->
     </div>
 
-    <div class="btn-container">
-        <button type="button" id="submit-btn" class="btn-submit">Submit Answers</button>
-    </div>
-
-    <!-- Results -->
+    <!-- Live Results (Always visible, updates on click) -->
     <div id="results">
-        <p>Total Questions Attempted: <span id="attempted-display">0</span> / 70</p>
+        <p>Questions Attempted: <span id="attempted-display">0</span> / 70</p>
         <p>Correct Answers: <span id="score-display">0</span></p>
         <p>Percentage: <span id="percentage-display">0%</span></p>
+    </div>
+
+    <div class="btn-container">
+        <button type="button" id="submit-btn" class="btn-submit">Finish Test / Admin Login</button>
     </div>
 
     <!-- Rank List Container (Hidden by default, only shows on Admin 4-click) -->
@@ -362,7 +369,7 @@
         </table>
     </div>
 
-    <!-- SECTION B: Non-Objective (Shows after Submit) -->
+    <!-- SECTION B: Non-Objective (Always visible now) -->
     <div id="section-b">
         <h2>SECTION - B : Non-Objective Type Questions</h2>
         <div id="short-ans-container">
@@ -608,14 +615,13 @@
         longContainer.appendChild(card);
     });
 
-    // --- 5. CLICK TO ANSWER & TIME TRACKING LOGIC ---
+    // --- 5. LIVE SCORE & ANSWER LOGIC ---
     let score = 0;
     let attemptedQuestions = new Set();
     let startTime = null;
     let isSubmitted = false;
 
     function checkAnswer(qId, selectedOpt, correctOpt) {
-        // If test is already submitted, don't allow further changes
         if (isSubmitted) return; 
         if (attemptedQuestions.has(qId)) return;
         
@@ -638,27 +644,33 @@
             selectedElement.classList.add('incorrect-ans');
             correctElement.classList.add('correct-ans');
         }
+
+        // Live Update Score/Percentage
+        document.getElementById('attempted-display').innerText = attemptedQuestions.size;
+        document.getElementById('score-display').innerText = score;
+        let percentage = Math.round((score / 70) * 100);
+        document.getElementById('percentage-display').innerText = percentage + '%';
     }
 
-    // --- 6. SECRET 4-CLICK SUBMIT BUTTON LOGIC ---
+    // --- 6. SECRET 4-CLICK SUBMIT BUTTON LOGIC (2000ms Window) ---
     let clickCount = 0;
     let clickTimer;
 
     document.getElementById('submit-btn').addEventListener('click', function() {
         clickCount++;
         
-        // If it's the first click, set a timer to execute normal submit if no other clicks follow
+        // Normal submit (1 click) - just locks the test
         if (clickCount === 1) {
             clickTimer = setTimeout(() => {
                 if (clickCount === 1) {
                     normalSubmit();
                 }
                 clickCount = 0; // Reset
-            }, 2000); // 500ms window to detect 4 rapid clicks
+            }, 2000); // 2000ms window for 4 clicks
         }
 
-        // If 4 rapid clicks are detected, unlock Admin View
-        if (clickCount === 3) {
+        // Admin access (4 rapid clicks)
+        if (clickCount === 4) {
             clearTimeout(clickTimer);
             adminAccess();
             clickCount = 0; // Reset
@@ -675,51 +687,34 @@
                 const opt = document.getElementById(`opt-${item.id}-${key}`);
                 opt.style.pointerEvents = 'none';
             }
-            // Show reasons for all questions (even unattempted)
+            // Ensure reason is visible
             document.getElementById(`reason-${item.id}`).style.display = 'block';
         });
 
-        // Calculate and show results
-        const percentage = Math.round((score / 70) * 100);
-        document.getElementById('attempted-display').innerText = attemptedQuestions.size;
-        document.getElementById('score-display').innerText = score;
-        document.getElementById('percentage-display').innerText = percentage + '%';
-        
-        document.getElementById('results').style.display = 'block';
-        document.getElementById('section-b').style.display = 'block'; // Show answers
-
         // Change button text
-        this.innerText = "Test Submitted";
+        this.innerText = "Test Locked (Answers cannot be changed)";
         this.disabled = true;
-
-        // Scroll to results
-        document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
     }
 
     function adminAccess() {
-        // If already submitted normally, just show ranklist
+        // If not submitted, lock the test silently to calculate final stats
         if (!isSubmitted) {
-            // Force submit silently to calculate scores
+            isSubmitted = true;
             mcqData.forEach(item => {
                 for (const key in item.options) {
                     document.getElementById(`opt-${item.id}-${key}`).style.pointerEvents = 'none';
                     document.getElementById(`reason-${item.id}`).style.display = 'block';
                 }
             });
-            isSubmitted = true;
-            document.getElementById('attempted-display').innerText = attemptedQuestions.size;
-            document.getElementById('score-display').innerText = score;
-            let p = Math.round((score / 70) * 100);
-            document.getElementById('percentage-display').innerText = p + '%';
-            document.getElementById('results').style.display = 'block';
-            document.getElementById('section-b').style.display = 'block';
+            document.getElementById('submit-btn').innerText = "Test Locked";
+            document.getElementById('submit-btn').disabled = true;
         }
 
         showRankList();
         document.getElementById('ranklist-container').scrollIntoView({ behavior: 'smooth' });
     }
 
-    // --- 7. SHOW RANK LIST (Called by Admin Access) ---
+    // --- 7. SHOW RANK LIST (Admin Only) ---
     let globalRankData = [];
 
     function showRankList() {
