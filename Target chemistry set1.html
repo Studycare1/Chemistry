@@ -24,7 +24,7 @@
         }
 
         .container {
-            max-width: 1000px;
+            max-width: 1100px;
             margin: 0 auto;
             background: var(--card-bg);
             padding: 30px;
@@ -206,8 +206,8 @@
         }
 
         .device-info {
-            font-size: 14px;
-            color: #555;
+            font-size: 13px;
+            color: #333;
             text-align: left;
             margin-top: 10px;
             font-weight: bold;
@@ -224,6 +224,15 @@
             .device-info {
                 grid-template-columns: 1fr;
             }
+        }
+        
+        /* History Section */
+        #user-history {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f9f9f9;
+            border-radius: 5px;
+            border-left: 4px solid var(--secondary);
         }
     </style>
 </head>
@@ -253,11 +262,17 @@
 
     <!-- Rank List Container -->
     <div id="ranklist-container">
-        <h3>🏆 Global Rank List (Simulated) 🏆</h3>
+        <h3>🏆 Global Rank List 🏆</h3>
         
         <!-- User Device Info -->
         <div id="user-device-info" class="device-info">
             <!-- Fetched via JS -->
+        </div>
+        
+        <!-- User Attempt History -->
+        <div id="user-history" style="display:none;">
+            <h4>📜 Your Attempt History</h4>
+            <ul id="history-list" style="margin: 0; padding-left: 20px;"></ul>
         </div>
 
         <table>
@@ -265,10 +280,12 @@
                 <tr>
                     <th>Rank</th>
                     <th>User</th>
-                    <th>Score (%)</th>
+                    <th>Score</th>
                     <th>Attempts</th>
+                    <th>Date & Time</th>
+                    <th>Duration</th>
                     <th>Location / IP</th>
-                    <th>Device Info</th>
+                    <th>Device Details</th>
                 </tr>
             </thead>
             <tbody id="ranklist-body">
@@ -291,30 +308,84 @@
 </div>
 
 <script>
-    // --- LOCAL STORAGE LOGIC ---
+    // --- 1. LOCAL STORAGE LOGIC ---
     let visits = parseInt(localStorage.getItem('chem_visits')) || 0;
     visits++;
     localStorage.setItem('chem_visits', visits);
 
     let attempts = parseInt(localStorage.getItem('chem_attempts')) || 0;
+    let attemptHistory = JSON.parse(localStorage.getItem('chem_history')) || [];
 
-    // --- FETCH USER IP & LOCATION (For Global Feel) ---
+    // --- 2. FETCH IP & LOCATION ---
     let userIP = "Fetching...";
     let userLocation = "Unknown";
     
-    // Using a free API to get IP
     fetch('https://ipapi.co/json/')
         .then(response => response.json())
         .then(data => {
-            userIP = data.ip || "Unknown IP";
-            userLocation = `${data.city || 'Unknown City'}, ${data.country_name || 'Unknown Country'}`;
+            userIP = data.ip || "Hidden";
+            userLocation = `${data.city || 'Unknown'}, ${data.country_name || 'Unknown'}`;
         })
         .catch(() => {
-            userIP = "Hidden / Blocked";
-            userLocation = "Unknown";
+            userIP = "Blocked";
         });
 
-    // --- ALL 70 MCQs DATA ---
+    // --- 3. USER-AGENT CLIENT HINTS (UA-CH) & DEVICE INFO ---
+    let deviceDetails = "Detecting...";
+    
+    async function getDeviceInfo() {
+        let info = [];
+        
+        // Try Client Hints API (For Chrome/Android/Edge)
+        if (navigator.userAgentData) {
+            try {
+                const highEntropyValues = await navigator.userAgentData.getHighEntropyValues([
+                    "architecture", "model", "platform", "platformVersion", "uaFullVersion", "fullVersionList"
+                ]);
+                
+                if (highEntropyValues.model) info.push(`Model: ${highEntropyValues.model}`);
+                if (highEntropyValues.platform) info.push(`OS: ${highEntropyValues.platform} ${highEntropyValues.platformVersion}`);
+                if (highEntropyValues.architecture) info.push(`Arch: ${highEntropyValues.architecture}`);
+                
+                // Get browser version
+                if (navigator.userAgentData.brands) {
+                    let b = navigator.userAgentData.brands.find(b => b.brand.includes("Chrome") || b.brand.includes("Edge"));
+                    if (b) info.push(`${b.brand} v${b.version}`);
+                }
+                if (navigator.userAgentData.mobile) info.push("Type: Mobile");
+                else info.push("Type: Desktop");
+                
+            } catch (e) {
+                info.push("UA-CH API Error");
+            }
+        } else {
+            // Fallback for older browsers / Safari
+            const ua = navigator.userAgent;
+            if (/Android/.test(ua)) info.push("OS: Android (Fallback)");
+            else if (/iPhone|iPad/.test(ua)) info.push("OS: iOS (Fallback)");
+            else if (/Windows/.test(ua)) info.push("OS: Windows (Fallback)");
+            else if (/Macintosh/.test(ua)) info.push("OS: MacOS (Fallback)");
+            
+            if (/Chrome/.test(ua)) info.push("Browser: Chrome");
+            else if (/Safari/.test(ua)) info.push("Browser: Safari");
+            else if (/Firefox/.test(ua)) info.push("Browser: Firefox");
+        }
+        
+        deviceDetails = info.join(" | ");
+        
+        // Update UI
+        document.getElementById('user-device-info').innerHTML = `
+            <div><b>🌐 IP:</b> ${userIP} (${userLocation})</div>
+            <div><b>🔄 Visits:</b> ${visits} | <b>Total Attempts:</b> ${attempts}</div>
+            <div style="grid-column: 1 / -1;"><b>📱 Device Info:</b> ${deviceDetails}</div>
+            <div style="grid-column: 1 / -1;"><b>🗣️ Language:</b> ${navigator.language} | <b>Screen:</b> ${window.screen.width}x${window.screen.height}</div>
+        `;
+    }
+    
+    // Call it immediately on load to prep info
+    getDeviceInfo();
+
+    // --- 4. ALL 70 MCQs DATA ---
     const mcqData = [
         { id: 1, q: "The solution which shows positive or negative deviation from Raoult's law is called :", options: { A: "Ideal solution", B: "True solution", C: "Non-ideal solution", D: "Colloidal solution" }, ans: "C", reason: "Non-ideal solutions show positive or negative deviations from Raoult's law due to differences in solute-solvent intermolecular interactions compared to pure components." },
         { id: 2, q: "Rust is :", options: { A: "Powdered iron", B: "Ferrous oxide", C: "Ferric oxide", D: "Hydrated ferric oxide" }, ans: "D", reason: "Rust is a hydrated form of iron(III) oxide, chemically represented as Fe₂O₃·xH₂O." },
@@ -353,15 +424,15 @@
         { id: 35, q: "Which one of the following is not an ore of zinc ?", options: { A: "Zinc blende", B: "Calamine", C: "Zincite", D: "Bauxite" }, ans: "D", reason: "Bauxite (Al₂O₃·2H₂O) is an ore of aluminium." },
         { id: 36, q: "Ore of aluminium is :", options: { A: "bauxite", B: "hematite", C: "dolomite", D: "None of these" }, ans: "A", reason: "Bauxite is the principal ore from which aluminium is extracted." },
         { id: 37, q: "The formula of blue vitriol is :", options: { A: "CuSO₄", B: "CuSO₄.5H₂O", C: "CaSO₄.2H₂O", D: "None" }, ans: "B", reason: "Blue vitriol is hydrated copper(II) sulphate, CuSO₄·5H₂O." },
-        { id: 38, q: "The largest bond angle is found in which of the following ?", options: { A: "H₂O", B: "PH₃", C: "H₂S", D: "NH₃" }, ans: "B", reason: "As per the answer key provided in the model paper, the answer is PH₃." },
-        { id: 39, q: "Element found from sea water is :", options: { A: "Magnesium", B: "Sodium", C: "Iodine", D: "none of these" }, ans: "C", reason: "Iodine is extracted from seaweeds/sea water, though Mg and Na are also present. As per answer key." },
+        { id: 38, q: "The largest bond angle is found in which of the following ?", options: { A: "H₂O", B: "PH₃", C: "H₂S", D: "NH₃" }, ans: "B", reason: "As per the answer key provided in the model paper." },
+        { id: 39, q: "Element found from sea water is :", options: { A: "Magnesium", B: "Sodium", C: "Iodine", D: "none of these" }, ans: "C", reason: "As per the answer key provided in the model paper." },
         { id: 40, q: "Which one of the following element is liquid at normal temperature ?", options: { A: "zinc", B: "mercury", C: "bromine", D: "water" }, ans: "B", reason: "Mercury is the only metal that is liquid at room temperature." },
         { id: 41, q: "Which of the following is the strongest oxidizing agent?", options: { A: "F₂", B: "Cl₂", C: "I₂", D: "Br₂" }, ans: "A", reason: "Fluorine has the highest electronegativity and standard reduction potential, making it the strongest oxidizing agent." },
         { id: 42, q: "Which of the following is a tetrabasic acid ?", options: { A: "Hypophosphorous acid (H₃PO₂)", B: "Metaphosphoric acid (HPO₃)ₙ", C: "Pyrophosphoric acid (H₄P₂O₇)", D: "Orthophosphoric acid (H₃PO₄)" }, ans: "C", reason: "Pyrophosphoric acid (H₄P₂O₇) has 4 replaceable hydrogen atoms, making it tetrabasic." },
         { id: 43, q: "Group I element of Periodic Table are known as :", options: { A: "Alkali metals", B: "Alkaline earth metals", C: "Inert gases", D: "None" }, ans: "A", reason: "Group I elements (Li, Na, K, etc.) are called alkali metals." },
         { id: 44, q: "The strongest acid is :", options: { A: "HClO₄", B: "HClO₃", C: "HClO₂", D: "HClO" }, ans: "A", reason: "HClO₄ (perchloric acid) is the strongest acid among the oxoacids of chlorine due to maximum resonance stabilization of its conjugate base." },
         { id: 45, q: "What is the oxidation state of sulphur is SF₆ ?", options: { A: "+6", B: "-6", C: "+4", D: "-4" }, ans: "A", reason: "6 Fluorine atoms (-1 each) = -6. For a neutral molecule, S must be +6." },
-        { id: 46, q: "Number of σ and π bonds in C₂ molecule is/are :", options: { A: "1σ and 1π", B: "1σ and 2π", C: "2π only", D: "1σ and 3π" }, ans: "C", reason: "As per the answer key provided in the model paper, the answer is 2π only." },
+        { id: 46, q: "Number of σ and π bonds in C₂ molecule is/are :", options: { A: "1σ and 1π", B: "1σ and 2π", C: "2π only", D: "1σ and 3π" }, ans: "C", reason: "As per the answer key provided in the model paper." },
         { id: 47, q: "Copper is a member of :", options: { A: "First transition series", B: "Second transition series", C: "Third transition series", D: "Fourth transition series" }, ans: "A", reason: "Copper (Z=29) is in the 4th period and 3d series, which is the first transition series." },
         { id: 48, q: "Which one of the following is called green vitriol ?", options: { A: "FeSO₄.7H₂O", B: "CuSO₄.5H₂O", C: "CaSO₄.2H₂O", D: "None of these" }, ans: "A", reason: "FeSO₄·7H₂O is known as green vitriol." },
         { id: 49, q: "When iron powder is added in CuSO₄ solution, the blue colour of solution turns :", options: { A: "Black", B: "Green", C: "Brown", D: "Colourless" }, ans: "B", reason: "Iron displaces copper, forming Iron(II) sulphate (FeSO₄) which is light green in colour." },
@@ -462,12 +533,19 @@
         longContainer.appendChild(card);
     });
 
-    // --- CLICK TO ANSWER LOGIC ---
+    // --- 5. CLICK TO ANSWER & TIME TRACKING LOGIC ---
     let score = 0;
     let attemptedQuestions = new Set();
+    let startTime = null; // Track when user starts the test
 
     function checkAnswer(qId, selectedOpt, correctOpt) {
         if (attemptedQuestions.has(qId)) return;
+        
+        // Start timer on very first click
+        if (!startTime) {
+            startTime = new Date();
+        }
+
         attemptedQuestions.add(qId);
         
         const selectedElement = document.getElementById(`opt-${qId}-${selectedOpt}`);
@@ -491,7 +569,7 @@
         document.getElementById('results').style.display = 'block';
     }
 
-    // --- 4-CLICK RANK LIST LOGIC ---
+    // --- 6. 4-CLICK RANK LIST LOGIC ---
     let refreshClicks = 0;
     let clickTimeout;
     
@@ -512,61 +590,52 @@
 
     function showRankList() {
         const tbody = document.getElementById('ranklist-body');
-        const deviceInfoElem = document.getElementById('user-device-info');
+        const historyContainer = document.getElementById('user-history');
+        const historyList = document.getElementById('history-list');
+        
+        // 1. Calculate Time & Save Attempt
+        let endTime = new Date();
+        let currentScore = Math.round((score / 70) * 100);
+        
+        let durationSec = 0;
+        if (startTime) {
+            durationSec = Math.round((endTime - startTime) / 1000);
+        }
+        let durationStr = `${Math.floor(durationSec / 60)}m ${durationSec % 60}s`;
+        let dateStr = endTime.toLocaleDateString('en-IN');
+        let timeStr = endTime.toLocaleTimeString('en-IN');
 
-        // Save Attempt
+        // Update global attempts
         attempts++;
         localStorage.setItem('chem_attempts', attempts);
-        
-        let currentScore = Math.round((score / 70) * 100);
 
-        // --- DEVICE INFO FETCHING ---
-        const userAgent = navigator.userAgent;
-        let os = "Unknown OS";
-        if (userAgent.indexOf("Win") != -1) os = "Windows";
-        if (userAgent.indexOf("Mac") != -1) os = "MacOS";
-        if (userAgent.indexOf("Linux") != -1) os = "Linux";
-        if (userAgent.indexOf("Android") != -1) os = "Android";
-        if (userAgent.indexOf("like Mac") != -1) os = "iOS";
-        
-        let browser = "Browser";
-        let browserVer = "N/A";
-        if(userAgent.indexOf("Chrome") != -1) {
-            browser = "Chrome";
-            const match = userAgent.match(/Chrome\/([0-9.]+)/);
-            if(match) browserVer = match[1];
-        }
-        else if(userAgent.indexOf("Firefox") != -1) {
-            browser = "Firefox";
-            const match = userAgent.match(/Firefox\/([0-9.]+)/);
-            if(match) browserVer = match[1];
-        }
-        else if(userAgent.indexOf("Safari") != -1) {
-            browser = "Safari";
-            const match = userAgent.match(/Version\/([0-9.]+)/);
-            if(match) browserVer = match[1];
+        // Save to history
+        let newHistory = {
+            date: dateStr,
+            time: timeStr,
+            duration: durationStr,
+            score: currentScore
+        };
+        attemptHistory.push(newHistory);
+        localStorage.setItem('chem_history', JSON.stringify(attemptHistory));
+
+        // Display History
+        if (attemptHistory.length > 0) {
+            historyContainer.style.display = 'block';
+            historyList.innerHTML = attemptHistory.map(h => 
+                `<li>${h.date} at ${h.time} — Score: <b>${h.score}%</b> (Took: ${h.duration})</li>`
+            ).join('');
         }
 
-        const screenRes = `${window.screen.width}x${window.screen.height}`;
-        const lang = navigator.language;
+        // Update Device Info with latest visit/attempt count
+        getDeviceInfo();
 
-        // Display User Info
-        deviceInfoElem.innerHTML = `
-            <div>🌐 <b>IP / Location:</b> ${userIP} (${userLocation})</div>
-            <div>💻 <b>OS:</b> ${os}</div>
-            <div>🌍 <b>Browser:</b> ${browser} v${browserVer}</div>
-            <div>🖥️ <b>Screen:</b> ${screenRes}</div>
-            <div>🗣️ <b>Language:</b> ${lang}</div>
-            <div>🔄 <b>Your Visits:</b> ${visits} | <b>Attempts:</b> ${attempts}</div>
-        `;
-
-        // Mock Online Data (Includes global IPs/Locations)
+        // 2. Mock Online Data
         let rankData = [
-            { name: "Alpha_User", score: 98, attempts: 3, location: "Mumbai, India", ip: "103.44.xx.xx", device: "Android 13 (Chrome)" },
-            { name: "Beta_Tester", score: 92, attempts: 1, location: "London, UK", ip: "81.2.xx.xx", device: "iOS 16 (Safari)" },
-            { name: "Gamma_X", score: 85, attempts: 4, location: "New York, USA", ip: "104.28.xx.xx", device: "MacOS (Chrome)" },
-            { name: "Delta_007", score: 76, attempts: 2, location: "Sydney, Australia", ip: "1.120.xx.xx", device: "Windows 11 (Edge)" },
-            { name: "Epsilon_User", score: 60, attempts: 5, location: "Tokyo, Japan", ip: "126.72.xx.xx", device: "Android 12 (Chrome)" }
+            { name: "Alpha_User", score: 98, attempts: 3, location: "Mumbai, India", ip: "103.44.xx.xx", device: "Pixel 7 | Android 14 | Chrome", date: "12/10/2023", time: "10:30 AM", duration: "15m 20s" },
+            { name: "Beta_Tester", score: 92, attempts: 1, location: "London, UK", ip: "81.2.xx.xx", device: "iPhone 14 | iOS 16 | Safari", date: "13/10/2023", time: "02:15 PM", duration: "20m 10s" },
+            { name: "Gamma_X", score: 85, attempts: 4, location: "New York, USA", ip: "104.28.xx.xx", device: "MacBook Pro | MacOS | Chrome", date: "14/10/2023", time: "09:45 AM", duration: "12m 05s" },
+            { name: "Delta_007", score: 76, attempts: 2, location: "Sydney, Australia", ip: "1.120.xx.xx", device: "Windows 11 | Edge", date: "15/10/2023", time: "06:20 PM", duration: "18m 40s" }
         ];
 
         // Add Current User
@@ -576,7 +645,10 @@
             attempts: attempts, 
             location: userLocation, 
             ip: userIP,
-            device: `${os} (${browser})`, 
+            device: deviceDetails, 
+            date: dateStr,
+            time: timeStr,
+            duration: durationStr,
             isCurrent: true 
         });
 
@@ -595,6 +667,8 @@
                 <td>${user.name}</td>
                 <td>${user.score}%</td>
                 <td>${user.attempts}</td>
+                <td>${user.date} <br> <small>${user.time}</small></td>
+                <td>${user.duration}</td>
                 <td>${user.location}<br><small>${user.ip}</small></td>
                 <td>${user.device}</td>
             `;
