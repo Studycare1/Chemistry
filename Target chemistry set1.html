@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chemistry Model Paper - Full 70 MCQs & Section B</title>
+    <title>Chemistry Model Paper - Global Interactive</title>
     <style>
         :root {
             --primary: #2c3e50;
             --secondary: #34495e;
             --correct: #2ecc71;
             --incorrect: #e74c3c;
-            --bg: #ecf0f1;
+            --bg: #f4f7f6;
             --card-bg: #ffffff;
         }
 
@@ -24,7 +24,7 @@
         }
 
         .container {
-            max-width: 950px;
+            max-width: 1000px;
             margin: 0 auto;
             background: var(--card-bg);
             padding: 30px;
@@ -50,13 +50,13 @@
             border: 1px solid #ddd;
             border-radius: 8px;
             padding: 15px 20px;
-            margin-bottom: 15px;
-            transition: background 0.3s;
+            margin-bottom: 20px;
         }
 
         .question-text {
             font-weight: 600;
-            margin-bottom: 10px;
+            margin-bottom: 15px;
+            font-size: 16px;
         }
 
         .options {
@@ -71,36 +71,45 @@
             }
         }
 
-        .option-label {
+        .option-btn {
             display: flex;
             align-items: center;
             cursor: pointer;
-            padding: 8px;
+            padding: 10px 15px;
             border-radius: 5px;
-            transition: background 0.2s;
-            border: 1px solid transparent;
+            transition: background 0.2s, transform 0.1s;
+            border: 1px solid #ccc;
+            background: white;
+            font-size: 15px;
         }
 
-        .option-label:hover {
+        .option-btn:hover {
             background: #e9ecef;
         }
 
-        input[type="radio"] {
-            margin-right: 10px;
-            cursor: pointer;
-        }
-
-        .correct-ans {
+        .option-btn.correct-ans {
             background-color: #d4edda !important;
-            border: 1px solid var(--correct);
+            border: 2px solid var(--correct);
             color: #155724;
             font-weight: bold;
         }
 
-        .incorrect-ans {
+        .option-btn.incorrect-ans {
             background-color: #f8d7da !important;
-            border: 1px solid var(--incorrect);
+            border: 2px solid var(--incorrect);
             color: #721c24;
+            font-weight: bold;
+        }
+
+        .reason-box {
+            display: none;
+            margin-top: 15px;
+            padding: 10px;
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            border-radius: 4px;
+            font-size: 14px;
+            color: #856404;
         }
 
         /* Buttons */
@@ -123,24 +132,9 @@
             transition: transform 0.1s, opacity 0.2s;
         }
 
-        button:active {
-            transform: scale(0.98);
-        }
-
-        .btn-submit {
+        .btn-refresh {
             background-color: var(--primary);
             color: white;
-        }
-
-        .btn-refresh {
-            background-color: var(--secondary);
-            color: white;
-        }
-
-        button:disabled {
-            opacity: 0.6;
-            cursor: not-allowed;
-            transform: none;
         }
 
         /* Results */
@@ -161,9 +155,11 @@
             display: none;
             margin-top: 30px;
             padding: 20px;
-            background: #fff3cd;
+            background: #fff;
             border-radius: 8px;
-            border: 1px solid #ffeeba;
+            border: 1px solid #ddd;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.05);
+            overflow-x: auto;
         }
 
         table {
@@ -171,11 +167,12 @@
             border-collapse: collapse;
             margin-top: 15px;
             background: white;
+            font-size: 13px;
         }
 
         th, td {
-            padding: 12px;
-            text-align: left;
+            padding: 10px;
+            text-align: center;
             border-bottom: 1px solid #ddd;
         }
 
@@ -184,10 +181,13 @@
             color: white;
         }
 
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+
         /* Section B */
         #section-b {
             margin-top: 40px;
-            display: none;
         }
 
         .ans-card {
@@ -208,9 +208,22 @@
         .device-info {
             font-size: 14px;
             color: #555;
-            text-align: center;
+            text-align: left;
             margin-top: 10px;
             font-weight: bold;
+            background: #e8f4f8;
+            padding: 15px;
+            border-radius: 5px;
+            border: 1px solid #bce8f1;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        @media (max-width: 600px) {
+            .device-info {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
 </head>
@@ -222,34 +235,39 @@
         Time: 3 Hours + 15 Minutes | Total Marks: 70
     </div>
 
-    <form id="quiz-form">
-        <h2>SECTION - A : Objective Type Questions (70 MCQs)</h2>
-        <div id="mcq-container">
-            <!-- Questions injected via JS -->
-        </div>
+    <h2>SECTION - A : Objective Type Questions</h2>
+    <div id="mcq-container">
+        <!-- Questions injected via JS -->
+    </div>
 
-        <div class="btn-container">
-            <button type="button" id="submit-btn" class="btn-submit">Submit Answers</button>
-            <button type="button" id="refresh-btn" class="btn-refresh">Refresh Rank List (Click 4x Fast)</button>
-        </div>
-    </form>
+    <div class="btn-container">
+        <button type="button" id="refresh-btn" class="btn-refresh">Show Global Rank & Answers (Click 4x Fast)</button>
+    </div>
 
     <!-- Results -->
     <div id="results">
-        <p>Score: <span id="score-display">0</span> / 70</p>
+        <p>Total Questions Attempted: <span id="attempted-display">0</span> / 70</p>
+        <p>Correct Answers: <span id="score-display">0</span></p>
         <p>Percentage: <span id="percentage-display">0%</span></p>
     </div>
 
     <!-- Rank List Container -->
     <div id="ranklist-container">
-        <h3>🏆 Online Rank List 🏆</h3>
-        <p id="user-device-info" class="device-info"></p>
+        <h3>🏆 Global Rank List (Simulated) 🏆</h3>
+        
+        <!-- User Device Info -->
+        <div id="user-device-info" class="device-info">
+            <!-- Fetched via JS -->
+        </div>
+
         <table>
             <thead>
                 <tr>
                     <th>Rank</th>
                     <th>User</th>
                     <th>Score (%)</th>
+                    <th>Attempts</th>
+                    <th>Location / IP</th>
                     <th>Device Info</th>
                 </tr>
             </thead>
@@ -273,81 +291,103 @@
 </div>
 
 <script>
+    // --- LOCAL STORAGE LOGIC ---
+    let visits = parseInt(localStorage.getItem('chem_visits')) || 0;
+    visits++;
+    localStorage.setItem('chem_visits', visits);
+
+    let attempts = parseInt(localStorage.getItem('chem_attempts')) || 0;
+
+    // --- FETCH USER IP & LOCATION (For Global Feel) ---
+    let userIP = "Fetching...";
+    let userLocation = "Unknown";
+    
+    // Using a free API to get IP
+    fetch('https://ipapi.co/json/')
+        .then(response => response.json())
+        .then(data => {
+            userIP = data.ip || "Unknown IP";
+            userLocation = `${data.city || 'Unknown City'}, ${data.country_name || 'Unknown Country'}`;
+        })
+        .catch(() => {
+            userIP = "Hidden / Blocked";
+            userLocation = "Unknown";
+        });
+
     // --- ALL 70 MCQs DATA ---
     const mcqData = [
-        { id: 1, q: "The solution which shows positive or negative deviation from Raoult's law is called :", options: { A: "Ideal solution", B: "True solution", C: "Non-ideal solution", D: "Colloidal solution" }, ans: "C" },
-        { id: 2, q: "Rust is :", options: { A: "Powdered iron", B: "Ferrous oxide", C: "Ferric oxide", D: "Hydrated ferric oxide" }, ans: "D" },
-        { id: 3, q: "The process of smelting involves reduction of metal oxide with :", options: { A: "Al", B: "C", C: "Mg", D: "S" }, ans: "B" },
-        { id: 4, q: "Which of the following has zero dipole moment ?", options: { A: "CH₃Cl", B: "CCl₄", C: "CH₂Cl₂", D: "CHCl₃" }, ans: "B" },
-        { id: 5, q: "Diethyl ether finds its use in medicine as :", options: { A: "pain killer", B: "hypnotic", C: "antiseptic", D: "anaesthetic" }, ans: "D" },
-        { id: 6, q: "Reaction of primary amine with chloroform in the presence of alcoholic KOH is called :", options: { A: "Hydrolysis", B: "Reduction", C: "Wurtz reaction", D: "Carbylamine reaction" }, ans: "D" },
-        { id: 7, q: "Which of the following is a disaccharide ?", options: { A: "Sucrose", B: "Glucose", C: "Fructose", D: "Starch" }, ans: "A" },
-        { id: 8, q: "An ore having two different metal atoms is :", options: { A: "Haematite", B: "Galena", C: "Magnetite", D: "Copper pyrite" }, ans: "D" },
-        { id: 9, q: "Which of the following has maximum number of unpaired electrons ?", options: { A: "Mg²⁺", B: "Ti³⁺", C: "V³⁺", D: "Fe³⁺" }, ans: "D" },
-        { id: 10, q: "When ethyl bromide is treated with dry silver oxide, then we get :", options: { A: "Diethyl ether", B: "Ethanal", C: "Ethane", D: "Ethene" }, ans: "A" },
-        { id: 11, q: "Alkyl halides form ethers by reacting with which of the following ?", options: { A: "Dry Ag₂O", B: "Moist Ag₂O", C: "Dry ZnO", D: "Moist ZnO" }, ans: "A" },
-        { id: 12, q: "Acetamide is :", options: { A: "Acidic", B: "Alkaline", C: "Amphoteric", D: "Neutral" }, ans: "C" },
-        { id: 13, q: "The osmotic pressure of a solution is represented by which of the following equations ?", options: { A: "π = CR/T", B: "π/C = RT", C: "π = CT/R", D: "π = RT/C" }, ans: "B" },
-        { id: 14, q: "Which of the following halogens does not exhibit a position oxidation state ?", options: { A: "I", B: "Br", C: "Cl", D: "F" }, ans: "D" },
-        { id: 15, q: "Which of the following is a ketohexose ?", options: { A: "Glucose", B: "Fructose", C: "Sucrose", D: "Starch" }, ans: "B" },
-        { id: 16, q: "Chloramine-T is a/an :", options: { A: "Disinfectant", B: "antiseptic", C: "Analgesic", D: "Antipyretic" }, ans: "A" },
-        { id: 17, q: "According to Freundlich adsorption isotherm :", options: { A: "x/m = kp^(1/n)", B: "m/x = k.p^(1/n)", C: "xm = kp^(1/n)", D: "x/m = k/p^(1/n)" }, ans: "A" },
-        { id: 18, q: "The IUPAC name of K₃[Fe(CN)₆] is :", options: { A: "Potassium ferrocyanide", B: "Potassium ferricyanide", C: "Potassium hexacyanoferrate (II)", D: "Potassium hexacyanoferrate (III)" }, ans: "D" },
-        { id: 19, q: "Which of the following is not an ideal solution ?", options: { A: "Benzene + Toluene", B: "Methyl alcohol + Ethyl alcohol", C: "Chloroform + Acetone", D: "Carbon tetrachloride + Silicone tetrachloride" }, ans: "C" },
-        { id: 20, q: "By which of the following processes colloidal sols are purified ?", options: { A: "Peptisation", B: "Coagulation", C: "Dialysis", D: "Flocculation" }, ans: "C" },
-        { id: 21, q: "The process of reduction of a metal oxide by carbon or carbon monoxide to the metal is called :", options: { A: "Smelting", B: "Roasting", C: "Calcination", D: "Leaching" }, ans: "A" },
-        { id: 22, q: "The oxidation number of Pt in [Pt(C₂H₄)Cl₃]⁻ is :", options: { A: "+1", B: "+2", C: "+3", D: "+4" }, ans: "B" },
-        { id: 23, q: "Alkyl halides are used for the preparation of which of the following ?", options: { A: "Alkane", B: "Alkene", C: "Alcohol", D: "All of these" }, ans: "D" },
-        { id: 24, q: "The IUPAC name of CH₃-CH(OH)-COOH is :", options: { A: "Lactic acid", B: "2-Hydroxy propanoic acid", C: "Propanoic acid", D: "None of these" }, ans: "B" },
-        { id: 25, q: "Which of the following diseases is caused due to the deficiency of Vitamin E ?", options: { A: "Beri-beri", B: "Scurvy", C: "Anti-fertility", D: "None of these" }, ans: "C" },
-        { id: 26, q: "Which of the following oxides shows ferro-magnetism ?", options: { A: "CrO₂", B: "MnO₂", C: "Fe₃O₄", D: "V₂O₅" }, ans: "A" },
-        { id: 27, q: "Which of the following is an amorphous solid ?", options: { A: "Graphite", B: "Quartz glass (SiO₂)", C: "Chrome alum", D: "Silicon carbide (SiC)" }, ans: "B" },
-        { id: 28, q: "Which of the following equations represents osmotic pressure ?", options: { A: "P = CRT", B: "P = CT/R", C: "P = RC/T", D: "P = RT/C" }, ans: "A" },
-        { id: 29, q: "pH of pure water is :", options: { A: "1", B: "4", C: "3", D: "7" }, ans: "D" },
-        { id: 30, q: "Osmotic pressure can be increased by :", options: { A: "Increasing temperature", B: "decreasing temperature", C: "increasing volume", D: "none" }, ans: "A" },
-        { id: 31, q: "Faraday's second law of electrolysis is related to :", options: { A: "Atomic number of cation", B: "Speed of cation", C: "Speed of anion", D: "Equivalent weight of electrolyte" }, ans: "D" },
-        { id: 32, q: "One Faraday electricity equal to how much Coulombs ?", options: { A: "96550", B: "96500", C: "96000", D: "95500" }, ans: "B" },
-        { id: 33, q: "Tyndall effect is not found is :", options: { A: "sugar solution", B: "colloidal solution of gold", C: "suspension", D: "emulsion" }, ans: "A" },
-        { id: 34, q: "Which of the following is an example of solid-solid system ?", options: { A: "Smoke", B: "Cake", C: "Synthetic gems", D: "Pumice stone" }, ans: "C" },
-        { id: 35, q: "Which one of the following is not an ore of zinc ?", options: { A: "Zinc blende", B: "Calamine", C: "Zincite", D: "Bauxite" }, ans: "D" },
-        { id: 36, q: "Ore of aluminium is :", options: { A: "bauxite", B: "hematite", C: "dolomite", D: "None of these" }, ans: "A" },
-        { id: 37, q: "The formula of blue vitriol is :", options: { A: "CuSO₄", B: "CuSO₄.5H₂O", C: "CaSO₄.2H₂O", D: "None" }, ans: "B" },
-        { id: 38, q: "The largest bond angle is found in which of the following ?", options: { A: "H₂O", B: "PH₃", C: "H₂S", D: "NH₃" }, ans: "B" },
-        { id: 39, q: "Element found from sea water is :", options: { A: "Magnesium", B: "Sodium", C: "Iodine", D: "none of these" }, ans: "C" },
-        { id: 40, q: "Which one of the following element is liquid at normal temperature ?", options: { A: "zinc", B: "mercury", C: "bromine", D: "water" }, ans: "B" },
-        { id: 41, q: "Which of the following is the strongest oxidizing agent?", options: { A: "F₂", B: "Cl₂", C: "I₂", D: "Br₂" }, ans: "A" },
-        { id: 42, q: "Which of the following is a tetrabasic acid ?", options: { A: "Hypophosphorous acid (H₃PO₂)", B: "Metaphosphoric acid (HPO₃)ₙ", C: "Pyrophosphoric acid (H₄P₂O₇)", D: "Orthophosphoric acid (H₃PO₄)" }, ans: "C" },
-        { id: 43, q: "Group I element of Periodic Table are known as :", options: { A: "Alkali metals", B: "Alkaline earth metals", C: "Inert gases", D: "None" }, ans: "A" },
-        { id: 44, q: "The strongest acid is :", options: { A: "HClO₄", B: "HClO₃", C: "HClO₂", D: "HClO" }, ans: "A" },
-        { id: 45, q: "What is the oxidation state of sulphur is SF₆ ?", options: { A: "+6", B: "-6", C: "+4", D: "-4" }, ans: "A" },
-        { id: 46, q: "Number of σ and π bonds in C₂ molecule is/are :", options: { A: "1σ and 1π", B: "1σ and 2π", C: "2π only", D: "1σ and 3π" }, ans: "C" },
-        { id: 47, q: "Copper is a member of :", options: { A: "First transition series", B: "Second transition series", C: "Third transition series", D: "Fourth transition series" }, ans: "A" },
-        { id: 48, q: "Which one of the following is called green vitriol ?", options: { A: "FeSO₄.7H₂O", B: "CuSO₄.5H₂O", C: "CaSO₄.2H₂O", D: "None of these" }, ans: "A" },
-        { id: 49, q: "When iron powder is added in CuSO₄ solution, the blue colour of solution turns :", options: { A: "Black", B: "Green", C: "Brown", D: "Colourless" }, ans: "B" },
-        { id: 50, q: "The element showing highest oxidation state among first transition series is :", options: { A: "Ni", B: "Cr", C: "Fe", D: "Mn" }, ans: "D" },
-        { id: 51, q: "Which of the following is known as red lead ?", options: { A: "Pb₃O₄", B: "Pb₂O₃", C: "PbO", D: "PbO₂" }, ans: "A" },
-        { id: 52, q: "Which metal nitrate gives colorless gas on thermal decomposition", options: { A: "NaNO₃", B: "Cu(NO₃)₂", C: "Ba(NO₃)₂", D: "Hg(NO₃)₂" }, ans: "B" },
-        { id: 53, q: "Which of the following compounds has tetrahedral geometry ?", options: { A: "[Ni(CN)₄]²⁻", B: "[Pd(CN)₄]²⁻", C: "[PdCl₄]²⁻", D: "[NiCl₄]²⁻" }, ans: "D" },
-        { id: 54, q: "The oxidation number of Fe in K₄[Fe(CN)₆] is :", options: { A: "+2", B: "+3", C: "-2", D: "-3" }, ans: "A" },
-        { id: 55, q: "The correct formula of hexamine platinum (IV) chloride is :", options: { A: "[Pt(NH₃)₆]Cl₄", B: "[Pt(NH₃)₆]Cl₂", C: "[Pt(NH₃)₂]Cl₃", D: "[Pt(NH₃)₆]Cl₆" }, ans: "A" },
-        { id: 56, q: "NaOH is:", options: { A: "Acid", B: "Base", C: "Salt", D: "All" }, ans: "B" },
-        { id: 57, q: "Alkene gives which of the following reactions ?", options: { A: "Addition reaction", B: "Substitution reaction", C: "Both 'A' and 'B'", D: "None of these" }, ans: "C" },
-        { id: 58, q: "The cannizzaro's reaction is not given by :", options: { A: "Formaldehyde", B: "Acetaldehyde", C: "Benzaldehyde", D: "Furfural" }, ans: "B" },
-        { id: 59, q: "Number of pi (π) bonds in aniline is :", options: { A: "0", B: "1", C: "2", D: "3" }, ans: "D" },
-        { id: 60, q: "CH₃CN on reduction gives :", options: { A: "CH₄", B: "CH₃COOH", C: "C₂H₅NH₂", D: "C₂H₅COOH" }, ans: "C" },
-        { id: 61, q: "Aniline reacts with Acetaldehyde to form :", options: { A: "Carbylamines", B: "Nitrobenzene", C: "Imine", D: "Schiffs base" }, ans: "D" },
-        { id: 62, q: "Which one of the following is natural polymer ?", options: { A: "Protein", B: "Nylon-6", C: "Buna-S", D: "Terrlene" }, ans: "A" },
-        { id: 63, q: "Vitamin A is known as :", options: { A: "Ascorbic acid", B: "Retinol", C: "Calciferol", D: "Tocopherol" }, ans: "B" },
-        { id: 64, q: "Which vitamin deficiency causes night blindness?", options: { A: "Vitamin A", B: "Vitamin B", C: "Vitamin C", D: "Vitamin D" }, ans: "A" },
-        { id: 65, q: "Hybridisation of carbon in ethane is :", options: { A: "sp³", B: "sp²", C: "sp", D: "sp³d²" }, ans: "A" },
-        { id: 66, q: "The reaction between alkyl halide and sodium metal is called :", options: { A: "Wurtz reaction", B: "Kolbe's reaction", C: "Clemmensen's reaction", D: "None of these" }, ans: "A" },
-        { id: 67, q: "The I.U.P.A.C. name of CH₃OC₂H₅ is :", options: { A: "Methoxy methane", B: "Ethoxy ethane", C: "Ethoxy methane", D: "None" }, ans: "D" },
-        { id: 68, q: "Which of the following is a formula of methoxy methane?", options: { A: "CH₃OCH₃", B: "CH₃COCH₃", C: "C₂H₅OCH₃", D: "C₂H₅COCH₃" }, ans: "A" },
-        { id: 69, q: "Ethanol when heated with excess of conc. H₂SO₄ at 170° C gives :", options: { A: "Ethane", B: "Ethene", C: "Dimeth yl ether", D: "Ethyl hydrogen Sulphate" }, ans: "B" },
-        { id: 70, q: "The name of acetone in IUPAC system is :", options: { A: "Methanal", B: "Ethanal", C: "Propanone", D: "Ethanone" }, ans: "C" }
+        { id: 1, q: "The solution which shows positive or negative deviation from Raoult's law is called :", options: { A: "Ideal solution", B: "True solution", C: "Non-ideal solution", D: "Colloidal solution" }, ans: "C", reason: "Non-ideal solutions show positive or negative deviations from Raoult's law due to differences in solute-solvent intermolecular interactions compared to pure components." },
+        { id: 2, q: "Rust is :", options: { A: "Powdered iron", B: "Ferrous oxide", C: "Ferric oxide", D: "Hydrated ferric oxide" }, ans: "D", reason: "Rust is a hydrated form of iron(III) oxide, chemically represented as Fe₂O₃·xH₂O." },
+        { id: 3, q: "The process of smelting involves reduction of metal oxide with :", options: { A: "Al", B: "C", C: "Mg", D: "S" }, ans: "B", reason: "Smelting is a process where a metal oxide is reduced by heating with carbon (coke) to extract the metal." },
+        { id: 4, q: "Which of the following has zero dipole moment ?", options: { A: "CH₃Cl", B: "CCl₄", C: "CH₂Cl₂", D: "CHCl₃" }, ans: "B", reason: "CCl₄ has a symmetrical tetrahedral geometry, so the individual bond dipoles cancel each other out, resulting in a net zero dipole moment." },
+        { id: 5, q: "Diethyl ether finds its use in medicine as :", options: { A: "pain killer", B: "hypnotic", C: "antiseptic", D: "anaesthetic" }, ans: "D", reason: "Diethyl ether was historically used as a general inhalation anesthetic." },
+        { id: 6, q: "Reaction of primary amine with chloroform in the presence of alcoholic KOH is called :", options: { A: "Hydrolysis", B: "Reduction", C: "Wurtz reaction", D: "Carbylamine reaction" }, ans: "D", reason: "Primary amines react with chloroform and alcoholic KOH to form foul-smelling isocyanides (carbylamines)." },
+        { id: 7, q: "Which of the following is a disaccharide ?", options: { A: "Sucrose", B: "Glucose", C: "Fructose", D: "Starch" }, ans: "A", reason: "Sucrose is formed by the condensation of two monosaccharides (glucose and fructose), making it a disaccharide." },
+        { id: 8, q: "An ore having two different metal atoms is :", options: { A: "Haematite", B: "Galena", C: "Magnetite", D: "Copper pyrite" }, ans: "D", reason: "Copper pyrite (CuFeS₂) contains both copper and iron atoms." },
+        { id: 9, q: "Which of the following has maximum number of unpaired electrons ?", options: { A: "Mg²⁺", B: "Ti³⁺", C: "V³⁺", D: "Fe³⁺" }, ans: "D", reason: "Fe³⁺ has a [Ar] 3d⁵ configuration, containing 5 unpaired electrons (maximum among the choices)." },
+        { id: 10, q: "When ethyl bromide is treated with dry silver oxide, then we get :", options: { A: "Diethyl ether", B: "Ethanal", C: "Ethane", D: "Ethene" }, ans: "A", reason: "Alkyl halides on heating with dry silver oxide (Ag₂O) give ethers (Williamson ether synthesis variation)." },
+        { id: 11, q: "Alkyl halides form ethers by reacting with which of the following ?", options: { A: "Dry Ag₂O", B: "Moist Ag₂O", C: "Dry ZnO", D: "Moist ZnO" }, ans: "A", reason: "Dry silver oxide reacts with alkyl halides to form ethers." },
+        { id: 12, q: "Acetamide is :", options: { A: "Acidic", B: "Alkaline", C: "Amphoteric", D: "Neutral" }, ans: "C", reason: "Acetamide (CH₃CONH₂) is amphoteric because it can donate a lone pair from nitrogen (basic) and donate a proton from the methyl group (acidic)." },
+        { id: 13, q: "The osmotic pressure of a solution is represented by which of the following equations ?", options: { A: "π = CR/T", B: "π/C = RT", C: "π = CT/R", D: "π = RT/C" }, ans: "B", reason: "Van't Hoff equation for osmotic pressure is π = CRT, which rearranges to π/C = RT." },
+        { id: 14, q: "Which of the following halogens does not exhibit a position oxidation state ?", options: { A: "I", B: "Br", C: "Cl", D: "F" }, ans: "D", reason: "Fluorine is the most electronegative element and only exhibits -1 oxidation state in its compounds." },
+        { id: 15, q: "Which of the following is a ketohexose ?", options: { A: "Glucose", B: "Fructose", C: "Sucrose", D: "Starch" }, ans: "B", reason: "Fructose is a monosaccharide with 6 carbons and a ketone group, hence a ketohexose." },
+        { id: 16, q: "Chloramine-T is a/an :", options: { A: "Disinfectant", B: "antiseptic", C: "Analgesic", D: "Antipyretic" }, ans: "A", reason: "Chloramine-T is used as a disinfectant and antiseptic. Water is treated with it to kill germs." },
+        { id: 17, q: "According to Freundlich adsorption isotherm :", options: { A: "x/m = kp^(1/n)", B: "m/x = k.p^(1/n)", C: "xm = kp^(1/n)", D: "x/m = k/p^(1/n)" }, ans: "A", reason: "The Freundlich equation is x/m = k * p^(1/n), where x is mass of adsorbate, m is mass of adsorbent, p is pressure." },
+        { id: 18, q: "The IUPAC name of K₃[Fe(CN)₆] is :", options: { A: "Potassium ferrocyanide", B: "Potassium ferricyanide", C: "Potassium hexacyanoferrate (II)", D: "Potassium hexacyanoferrate (III)" }, ans: "D", reason: "Fe is in +3 oxidation state, so it's ferrate(III). The complex is hexacyanoferrate(III)." },
+        { id: 19, q: "Which of the following is not an ideal solution ?", options: { A: "Benzene + Toluene", B: "Methyl alcohol + Ethyl alcohol", C: "Chloroform + Acetone", D: "Carbon tetrachloride + Silicone tetrachloride" }, ans: "C", reason: "Chloroform and acetone show hydrogen bonding between them, leading to a negative deviation from Raoult's law (non-ideal)." },
+        { id: 20, q: "By which of the following processes colloidal sols are purified ?", options: { A: "Peptisation", B: "Coagulation", C: "Dialysis", D: "Flocculation" }, ans: "C", reason: "Dialysis removes dissolved impurities (electrolytes) from a colloidal solution using a semi-permeable membrane." },
+        { id: 21, q: "The process of reduction of a metal oxide by carbon or carbon monoxide to the metal is called :", options: { A: "Smelting", B: "Roasting", C: "Calcination", D: "Leaching" }, ans: "A", reason: "Smelting is the reduction of metal oxide with carbon/coke or CO." },
+        { id: 22, q: "The oxidation number of Pt in [Pt(C₂H₄)Cl₃]⁻ is :", options: { A: "+1", B: "+2", C: "+3", D: "+4" }, ans: "B", reason: "C₂H₄ is a neutral ligand. 3 Cl⁻ gives -3. Overall -1, so x - 3 = -1 => x = +2." },
+        { id: 23, q: "Alkyl halides are used for the preparation of which of the following ?", options: { A: "Alkane", B: "Alkene", C: "Alcohol", D: "All of these" }, ans: "D", reason: "Alkyl halides are versatile intermediates used to synthesize alkanes, alkenes, alcohols, ethers, etc." },
+        { id: 24, q: "The IUPAC name of CH₃-CH(OH)-COOH is :", options: { A: "Lactic acid", B: "2-Hydroxy propanoic acid", C: "Propanoic acid", D: "None of these" }, ans: "B", reason: "The chain has 3 carbons (propanoic acid), with an OH group on the 2nd carbon." },
+        { id: 25, q: "Which of the following diseases is caused due to the deficiency of Vitamin E ?", options: { A: "Beri-beri", B: "Scurvy", C: "Anti-fertility", D: "None of these" }, ans: "C", reason: "Vitamin E deficiency can lead to anti-fertility effects, muscular weakness, etc." },
+        { id: 26, q: "Which of the following oxides shows ferro-magnetism ?", options: { A: "CrO₂", B: "MnO₂", C: "Fe₃O₄", D: "V₂O₅" }, ans: "A", reason: "CrO₂ is ferromagnetic. Fe₃O₄ is ferrimagnetic." },
+        { id: 27, q: "Which of the following is an amorphous solid ?", options: { A: "Graphite", B: "Quartz glass (SiO₂)", C: "Chrome alum", D: "Silicon carbide (SiC)" }, ans: "B", reason: "Quartz glass is an amorphous solid (supercooled liquid) because it lacks a long-range ordered structure." },
+        { id: 28, q: "Which of the following equations represents osmotic pressure ?", options: { A: "P = CRT", B: "P = CT/R", C: "P = RC/T", D: "P = RT/C" }, ans: "A", reason: "The osmotic pressure (π) is given by van't Hoff equation: π = CRT, where C is concentration, R is gas constant, T is temp." },
+        { id: 29, q: "pH of pure water is :", options: { A: "1", B: "4", C: "3", D: "7" }, ans: "D", reason: "At 25°C, pure water has [H+] = 10⁻⁷ M, so pH = 7." },
+        { id: 30, q: "Osmotic pressure can be increased by :", options: { A: "Increasing temperature", B: "decreasing temperature", C: "increasing volume", D: "none" }, ans: "A", reason: "π = CRT. Osmotic pressure is directly proportional to temperature (T)." },
+        { id: 31, q: "Faraday's second law of electrolysis is related to :", options: { A: "Atomic number of cation", B: "Speed of cation", C: "Speed of anion", D: "Equivalent weight of electrolyte" }, ans: "D", reason: "Faraday's second law states that the mass of substance deposited is proportional to its equivalent weight." },
+        { id: 32, q: "One Faraday electricity equal to how much Coulombs ?", options: { A: "96550", B: "96500", C: "96000", D: "95500" }, ans: "B", reason: "1 Faraday (charge on 1 mole of electrons) = 96500 Coulombs." },
+        { id: 33, q: "Tyndall effect is not found is :", options: { A: "sugar solution", B: "colloidal solution of gold", C: "suspension", D: "emulsion" }, ans: "A", reason: "Sugar solution is a true solution. The Tyndall effect is shown by colloidal solutions and suspensions, not true solutions." },
+        { id: 34, q: "Which of the following is an example of solid-solid system ?", options: { A: "Smoke", B: "Cake", C: "Synthetic gems", D: "Pumice stone" }, ans: "C", reason: "Synthetic gems are a solid-solid colloid (solid dispersed in solid)." },
+        { id: 35, q: "Which one of the following is not an ore of zinc ?", options: { A: "Zinc blende", B: "Calamine", C: "Zincite", D: "Bauxite" }, ans: "D", reason: "Bauxite (Al₂O₃·2H₂O) is an ore of aluminium." },
+        { id: 36, q: "Ore of aluminium is :", options: { A: "bauxite", B: "hematite", C: "dolomite", D: "None of these" }, ans: "A", reason: "Bauxite is the principal ore from which aluminium is extracted." },
+        { id: 37, q: "The formula of blue vitriol is :", options: { A: "CuSO₄", B: "CuSO₄.5H₂O", C: "CaSO₄.2H₂O", D: "None" }, ans: "B", reason: "Blue vitriol is hydrated copper(II) sulphate, CuSO₄·5H₂O." },
+        { id: 38, q: "The largest bond angle is found in which of the following ?", options: { A: "H₂O", B: "PH₃", C: "H₂S", D: "NH₃" }, ans: "B", reason: "As per the answer key provided in the model paper, the answer is PH₃." },
+        { id: 39, q: "Element found from sea water is :", options: { A: "Magnesium", B: "Sodium", C: "Iodine", D: "none of these" }, ans: "C", reason: "Iodine is extracted from seaweeds/sea water, though Mg and Na are also present. As per answer key." },
+        { id: 40, q: "Which one of the following element is liquid at normal temperature ?", options: { A: "zinc", B: "mercury", C: "bromine", D: "water" }, ans: "B", reason: "Mercury is the only metal that is liquid at room temperature." },
+        { id: 41, q: "Which of the following is the strongest oxidizing agent?", options: { A: "F₂", B: "Cl₂", C: "I₂", D: "Br₂" }, ans: "A", reason: "Fluorine has the highest electronegativity and standard reduction potential, making it the strongest oxidizing agent." },
+        { id: 42, q: "Which of the following is a tetrabasic acid ?", options: { A: "Hypophosphorous acid (H₃PO₂)", B: "Metaphosphoric acid (HPO₃)ₙ", C: "Pyrophosphoric acid (H₄P₂O₇)", D: "Orthophosphoric acid (H₃PO₄)" }, ans: "C", reason: "Pyrophosphoric acid (H₄P₂O₇) has 4 replaceable hydrogen atoms, making it tetrabasic." },
+        { id: 43, q: "Group I element of Periodic Table are known as :", options: { A: "Alkali metals", B: "Alkaline earth metals", C: "Inert gases", D: "None" }, ans: "A", reason: "Group I elements (Li, Na, K, etc.) are called alkali metals." },
+        { id: 44, q: "The strongest acid is :", options: { A: "HClO₄", B: "HClO₃", C: "HClO₂", D: "HClO" }, ans: "A", reason: "HClO₄ (perchloric acid) is the strongest acid among the oxoacids of chlorine due to maximum resonance stabilization of its conjugate base." },
+        { id: 45, q: "What is the oxidation state of sulphur is SF₆ ?", options: { A: "+6", B: "-6", C: "+4", D: "-4" }, ans: "A", reason: "6 Fluorine atoms (-1 each) = -6. For a neutral molecule, S must be +6." },
+        { id: 46, q: "Number of σ and π bonds in C₂ molecule is/are :", options: { A: "1σ and 1π", B: "1σ and 2π", C: "2π only", D: "1σ and 3π" }, ans: "C", reason: "As per the answer key provided in the model paper, the answer is 2π only." },
+        { id: 47, q: "Copper is a member of :", options: { A: "First transition series", B: "Second transition series", C: "Third transition series", D: "Fourth transition series" }, ans: "A", reason: "Copper (Z=29) is in the 4th period and 3d series, which is the first transition series." },
+        { id: 48, q: "Which one of the following is called green vitriol ?", options: { A: "FeSO₄.7H₂O", B: "CuSO₄.5H₂O", C: "CaSO₄.2H₂O", D: "None of these" }, ans: "A", reason: "FeSO₄·7H₂O is known as green vitriol." },
+        { id: 49, q: "When iron powder is added in CuSO₄ solution, the blue colour of solution turns :", options: { A: "Black", B: "Green", C: "Brown", D: "Colourless" }, ans: "B", reason: "Iron displaces copper, forming Iron(II) sulphate (FeSO₄) which is light green in colour." },
+        { id: 50, q: "The element showing highest oxidation state among first transition series is :", options: { A: "Ni", B: "Cr", C: "Fe", D: "Mn" }, ans: "D", reason: "Manganese (Mn) shows the highest oxidation state of +7 in the first transition series." },
+        { id: 51, q: "Which of the following is known as red lead ?", options: { A: "Pb₃O₄", B: "Pb₂O₃", C: "PbO", D: "PbO₂" }, ans: "A", reason: "Pb₃O₄ (Trilead tetroxide) is commonly known as red lead." },
+        { id: 52, q: "Which metal nitrate gives colorless gas on thermal decomposition", options: { A: "NaNO₃", B: "Cu(NO₃)₂", C: "Ba(NO₃)₂", D: "Hg(NO₃)₂" }, ans: "B", reason: "As per the answer key provided in the model paper." },
+        { id: 53, q: "Which of the following compounds has tetrahedral geometry ?", options: { A: "[Ni(CN)₄]²⁻", B: "[Pd(CN)₄]²⁻", C: "[PdCl₄]²⁻", D: "[NiCl₄]²⁻" }, ans: "D", reason: "[NiCl₄]²⁻ has Ni in +2 state (3d⁸). Cl⁻ is a weak field ligand, so it is tetrahedral (sp³)." },
+        { id: 54, q: "The oxidation number of Fe in K₄[Fe(CN)₆] is :", options: { A: "+2", B: "+3", C: "-2", D: "-3" }, ans: "A", reason: "4(+1) + x + 6(-1) = 0 => x = +2." },
+        { id: 55, q: "The correct formula of hexamine platinum (IV) chloride is :", options: { A: "[Pt(NH₃)₆]Cl₄", B: "[Pt(NH₃)₆]Cl₂", C: "[Pt(NH₃)₂]Cl₃", D: "[Pt(NH₃)₆]Cl₆" }, ans: "A", reason: "Pt is in +4 state. Six NH3 are neutral. We need 4 Cl⁻ ions outside the coordination sphere to balance." },
+        { id: 56, q: "NaOH is:", options: { A: "Acid", B: "Base", C: "Salt", D: "All" }, ans: "B", reason: "Sodium hydroxide is a strong base." },
+        { id: 57, q: "Alkene gives which of the following reactions ?", options: { A: "Addition reaction", B: "Substitution reaction", C: "Both 'A' and 'B'", D: "None of these" }, ans: "C", reason: "Alkenes undergo addition (e.g., H2, Br2) and substitution (e.g., allylic substitution) reactions." },
+        { id: 58, q: "The cannizzaro's reaction is not given by :", options: { A: "Formaldehyde", B: "Acetaldehyde", C: "Benzaldehyde", D: "Furfural" }, ans: "B", reason: "Cannizzaro's reaction is given by aldehydes without alpha-hydrogen. Acetaldehyde has alpha-hydrogens, so it gives aldol condensation." },
+        { id: 59, q: "Number of pi (π) bonds in aniline is :", options: { A: "0", B: "1", C: "2", D: "3" }, ans: "D", reason: "Benzene ring has 3 double bonds, hence 3 pi bonds." },
+        { id: 60, q: "CH₃CN on reduction gives :", options: { A: "CH₄", B: "CH₃COOH", C: "C₂H₅NH₂", D: "C₂H₅COOH" }, ans: "C", reason: "Reduction of nitriles (R-CN) with LiAlH4 gives primary amines (R-CH2-NH2)." },
+        { id: 61, q: "Aniline reacts with Acetaldehyde to form :", options: { A: "Carbylamines", B: "Nitrobenzene", C: "Imine", D: "Schiffs base" }, ans: "D", reason: "Primary amines react with aldehydes to form imines (Schiff bases)." },
+        { id: 62, q: "Which one of the following is natural polymer ?", options: { A: "Protein", B: "Nylon-6", C: "Buna-S", D: "Terrlene" }, ans: "A", reason: "Proteins are natural biopolymers made of amino acids." },
+        { id: 63, q: "Vitamin A is known as :", options: { A: "Ascorbic acid", B: "Retinol", C: "Calciferol", D: "Tocopherol" }, ans: "B", reason: "Vitamin A is chemically known as retinol." },
+        { id: 64, q: "Which vitamin deficiency causes night blindness?", options: { A: "Vitamin A", B: "Vitamin B", C: "Vitamin C", D: "Vitamin D" }, ans: "A", reason: "Deficiency of Vitamin A causes night blindness (Nyctalopia)." },
+        { id: 65, q: "Hybridisation of carbon in ethane is :", options: { A: "sp³", B: "sp²", C: "sp", D: "sp³d²" }, ans: "A", reason: "Ethane (C₂H₆) has only single bonds, so each carbon is sp³ hybridized with tetrahedral geometry." },
+        { id: 66, q: "The reaction between alkyl halide and sodium metal is called :", options: { A: "Wurtz reaction", B: "Kolbe's reaction", C: "Clemmensen's reaction", D: "None of these" }, ans: "A", reason: "Alkyl halides react with sodium metal in dry ether to form higher alkanes (Wurtz reaction)." },
+        { id: 67, q: "The I.U.P.A.C. name of CH₃OC₂H₅ is :", options: { A: "Methoxy methane", B: "Ethoxy ethane", C: "Ethoxy methane", D: "None" }, ans: "D", reason: "As per the answer key provided in the model paper." },
+        { id: 68, q: "Which of the following is a formula of methoxy methane?", options: { A: "CH₃OCH₃", B: "CH₃COCH₃", C: "C₂H₅OCH₃", D: "C₂H₅COCH₃" }, ans: "A", reason: "Methoxy methane is CH₃-O-CH₃ (dimethyl ether)." },
+        { id: 69, q: "Ethanol when heated with excess of conc. H₂SO₄ at 170° C gives :", options: { A: "Ethane", B: "Ethene", C: "Dimeth yl ether", D: "Ethyl hydrogen Sulphate" }, ans: "B", reason: "At 170°C, ethanol undergoes intramolecular dehydration to form ethene." },
+        { id: 70, q: "The name of acetone in IUPAC system is :", options: { A: "Methanal", B: "Ethanal", C: "Propanone", D: "Ethanone" }, ans: "C", reason: "Acetone (CH3COCH3) has 3 carbons and a ketone group, so it is propanone." }
     ];
 
-    // --- SHORT & LONG ANSWERS ---
     const shortAnsData = [
         { id: 1, q: "What is metamerism ?", a: "Metamerism is a type of structural isomerism in which compounds have the same molecular formula but different arrangements of alkyl groups around a functional group. Example: Diethyl ether and Methyl propyl ether." },
         { id: 2, q: "Discuss Faraday Second Law.", a: "The amount of substances deposited is directly proportional to their respective chemical equivalents. (x/E₁ = y/E₂ = z/E₃)." },
@@ -390,21 +430,22 @@
         let optionsHTML = '';
         for (const [key, value] of Object.entries(item.options)) {
             optionsHTML += `
-                <label class="option-label" id="label-${item.id}-${key}">
-                    <input type="radio" name="q${item.id}" value="${key}">
-                    (${key}) ${value}
-                </label>
+                <div class="option-btn" id="opt-${item.id}-${key}" onclick="checkAnswer(${item.id}, '${key}', '${item.ans}')">
+                    <strong>(${key})</strong>&nbsp; ${value}
+                </div>
             `;
         }
 
         qCard.innerHTML = `
             <div class="question-text">${item.id}. ${item.q}</div>
             <div class="options">${optionsHTML}</div>
+            <div class="reason-box" id="reason-${item.id}">
+                <strong>Reason:</strong> ${item.reason}
+            </div>
         `;
         mcqContainer.appendChild(qCard);
     });
 
-    // Render Section B
     const shortContainer = document.getElementById('short-ans-container');
     shortAnsData.forEach(item => {
         const card = document.createElement('div');
@@ -421,44 +462,34 @@
         longContainer.appendChild(card);
     });
 
-    // --- SUBMIT LOGIC ---
-    let userPercentage = 0;
+    // --- CLICK TO ANSWER LOGIC ---
+    let score = 0;
+    let attemptedQuestions = new Set();
 
-    document.getElementById('submit-btn').addEventListener('click', function() {
-        let score = 0;
-        const total = mcqData.length;
+    function checkAnswer(qId, selectedOpt, correctOpt) {
+        if (attemptedQuestions.has(qId)) return;
+        attemptedQuestions.add(qId);
         
-        document.querySelectorAll('input[type="radio"]').forEach(radio => radio.disabled = true);
-        this.disabled = true;
+        const selectedElement = document.getElementById(`opt-${qId}-${selectedOpt}`);
+        const correctElement = document.getElementById(`opt-${qId}-${correctOpt}`);
+        const reasonElement = document.getElementById(`reason-${qId}`);
 
-        mcqData.forEach(item => {
-            const selected = document.querySelector(`input[name="q${item.id}"]:checked`);
-            const correctLabel = document.getElementById(`label-${item.id}-${item.ans}`);
-            
-            correctLabel.classList.add('correct-ans');
+        reasonElement.style.display = 'block';
 
-            if (selected) {
-                const selectedLabel = document.getElementById(`label-${item.id}-${selected.value}`);
-                if (selected.value === item.ans) {
-                    score++;
-                } else {
-                    selectedLabel.classList.add('incorrect-ans');
-                }
-            }
-        });
+        if (selectedOpt === correctOpt) {
+            selectedElement.classList.add('correct-ans');
+            score++;
+        } else {
+            selectedElement.classList.add('incorrect-ans');
+            correctElement.classList.add('correct-ans');
+        }
 
-        userPercentage = Math.round((score / total) * 100);
-        
+        document.getElementById('attempted-display').innerText = attemptedQuestions.size;
         document.getElementById('score-display').innerText = score;
-        document.getElementById('percentage-display').innerText = userPercentage + '%';
-        
+        let percentage = Math.round((score / 70) * 100);
+        document.getElementById('percentage-display').innerText = percentage + '%';
         document.getElementById('results').style.display = 'block';
-        document.getElementById('section-b').style.display = 'block';
-        
-        // Auto scroll to results
-        document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
-    });
-
+    }
 
     // --- 4-CLICK RANK LIST LOGIC ---
     let refreshClicks = 0;
@@ -470,49 +501,87 @@
         clearTimeout(clickTimeout);
         clickTimeout = setTimeout(() => {
             refreshClicks = 0;
-        }, 800); // Must click 4 times within 800ms
+        }, 800);
 
         if (refreshClicks === 4) {
             showRankList();
             refreshClicks = 0;
+            document.getElementById('ranklist-container').scrollIntoView({ behavior: 'smooth' });
         }
     });
 
     function showRankList() {
-        const rankContainer = document.getElementById('ranklist-container');
         const tbody = document.getElementById('ranklist-body');
         const deviceInfoElem = document.getElementById('user-device-info');
 
-        // Detect Device
+        // Save Attempt
+        attempts++;
+        localStorage.setItem('chem_attempts', attempts);
+        
+        let currentScore = Math.round((score / 70) * 100);
+
+        // --- DEVICE INFO FETCHING ---
         const userAgent = navigator.userAgent;
-        let device = "Unknown Device";
-        if (userAgent.indexOf("Win") != -1) device = "Windows PC";
-        if (userAgent.indexOf("Mac") != -1) device = "Mac";
-        if (userAgent.indexOf("Linux") != -1) device = "Linux";
-        if (userAgent.indexOf("Android") != -1) device = "Android";
-        if (userAgent.indexOf("like Mac") != -1) device = "iOS";
+        let os = "Unknown OS";
+        if (userAgent.indexOf("Win") != -1) os = "Windows";
+        if (userAgent.indexOf("Mac") != -1) os = "MacOS";
+        if (userAgent.indexOf("Linux") != -1) os = "Linux";
+        if (userAgent.indexOf("Android") != -1) os = "Android";
+        if (userAgent.indexOf("like Mac") != -1) os = "iOS";
         
         let browser = "Browser";
-        if(userAgent.indexOf("Chrome") != -1) browser = "Chrome";
-        else if(userAgent.indexOf("Firefox") != -1) browser = "Firefox";
-        else if(userAgent.indexOf("Safari") != -1) browser = "Safari";
+        let browserVer = "N/A";
+        if(userAgent.indexOf("Chrome") != -1) {
+            browser = "Chrome";
+            const match = userAgent.match(/Chrome\/([0-9.]+)/);
+            if(match) browserVer = match[1];
+        }
+        else if(userAgent.indexOf("Firefox") != -1) {
+            browser = "Firefox";
+            const match = userAgent.match(/Firefox\/([0-9.]+)/);
+            if(match) browserVer = match[1];
+        }
+        else if(userAgent.indexOf("Safari") != -1) {
+            browser = "Safari";
+            const match = userAgent.match(/Version\/([0-9.]+)/);
+            if(match) browserVer = match[1];
+        }
 
-        const fullDeviceInfo = `${device} (${browser})`;
-        deviceInfoElem.innerText = `Your Device: ${fullDeviceInfo}`;
+        const screenRes = `${window.screen.width}x${window.screen.height}`;
+        const lang = navigator.language;
 
-        // Mock Online Data
+        // Display User Info
+        deviceInfoElem.innerHTML = `
+            <div>🌐 <b>IP / Location:</b> ${userIP} (${userLocation})</div>
+            <div>💻 <b>OS:</b> ${os}</div>
+            <div>🌍 <b>Browser:</b> ${browser} v${browserVer}</div>
+            <div>🖥️ <b>Screen:</b> ${screenRes}</div>
+            <div>🗣️ <b>Language:</b> ${lang}</div>
+            <div>🔄 <b>Your Visits:</b> ${visits} | <b>Attempts:</b> ${attempts}</div>
+        `;
+
+        // Mock Online Data (Includes global IPs/Locations)
         let rankData = [
-            { name: "User Alpha (Online)", score: 85, device: "iPhone 13 (Safari)" },
-            { name: "User Beta (Online)", score: 92, device: "Samsung S22 (Chrome)" },
-            { name: "User Gamma (Online)", score: 45, device: "MacBook Pro (Safari)" },
-            { name: "User Delta (Online)", score: 70, device: "Windows 11 (Edge)" },
+            { name: "Alpha_User", score: 98, attempts: 3, location: "Mumbai, India", ip: "103.44.xx.xx", device: "Android 13 (Chrome)" },
+            { name: "Beta_Tester", score: 92, attempts: 1, location: "London, UK", ip: "81.2.xx.xx", device: "iOS 16 (Safari)" },
+            { name: "Gamma_X", score: 85, attempts: 4, location: "New York, USA", ip: "104.28.xx.xx", device: "MacOS (Chrome)" },
+            { name: "Delta_007", score: 76, attempts: 2, location: "Sydney, Australia", ip: "1.120.xx.xx", device: "Windows 11 (Edge)" },
+            { name: "Epsilon_User", score: 60, attempts: 5, location: "Tokyo, Japan", ip: "126.72.xx.xx", device: "Android 12 (Chrome)" }
         ];
 
         // Add Current User
-        rankData.push({ name: "You (Current Device)", score: userPercentage, device: fullDeviceInfo, isCurrent: true });
+        rankData.push({ 
+            name: "You (Current Device)", 
+            score: currentScore, 
+            attempts: attempts, 
+            location: userLocation, 
+            ip: userIP,
+            device: `${os} (${browser})`, 
+            isCurrent: true 
+        });
 
-        // Sort by score
-        rankData.sort((a, b) => b.score - a.score);
+        // Sort by score descending
+        rankData.sort((a, b) => b.score - a.score || a.attempts - b.attempts);
 
         tbody.innerHTML = '';
         rankData.forEach((user, index) => {
@@ -525,13 +594,15 @@
                 <td>${index + 1}</td>
                 <td>${user.name}</td>
                 <td>${user.score}%</td>
+                <td>${user.attempts}</td>
+                <td>${user.location}<br><small>${user.ip}</small></td>
                 <td>${user.device}</td>
             `;
             tbody.appendChild(tr);
         });
 
-        rankContainer.style.display = 'block';
-        rankContainer.scrollIntoView({ behavior: 'smooth' });
+        document.getElementById('ranklist-container').style.display = 'block';
+        document.getElementById('section-b').style.display = 'block';
     }
 </script>
 </body>
