@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chemistry Model Paper - Full 70 MCQs & Section B</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --secondary: #34495e;
+            --correct: #2ecc71;
+            --incorrect: #e74c3c;
+            --bg: #ecf0f1;
+            --card-bg: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 950px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        h1, h2, h3 {
+            text-align: center;
+            color: var(--primary);
+        }
+
+        .header-info {
+            text-align: center;
+            font-weight: bold;
+            margin-bottom: 30px;
+            color: var(--secondary);
+        }
+
+        /* MCQ Styles */
+        .question-card {
+            background: #fafafa;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            transition: background 0.3s;
+        }
+
+        .question-text {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .options {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+        }
+
+        @media (max-width: 600px) {
+            .options {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 5px;
+            transition: background 0.2s;
+            border: 1px solid transparent;
+        }
+
+        .option-label:hover {
+            background: #e9ecef;
+        }
+
+        input[type="radio"] {
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .correct-ans {
+            background-color: #d4edda !important;
+            border: 1px solid var(--correct);
+            color: #155724;
+            font-weight: bold;
+        }
+
+        .incorrect-ans {
+            background-color: #f8d7da !important;
+            border: 1px solid var(--incorrect);
+            color: #721c24;
+        }
+
+        /* Buttons */
+        .btn-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        button {
+            padding: 12px 25px;
+            font-size: 16px;
+            font-weight: bold;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.1s, opacity 0.2s;
+        }
+
+        button:active {
+            transform: scale(0.98);
+        }
+
+        .btn-submit {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-refresh {
+            background-color: var(--secondary);
+            color: white;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Results */
+        #results {
+            display: none;
+            text-align: center;
+            font-size: 22px;
+            font-weight: bold;
+            margin-top: 20px;
+            padding: 20px;
+            background: #e8f4f8;
+            border-radius: 8px;
+            border-left: 5px solid var(--primary);
+        }
+
+        /* Rank List */
+        #ranklist-container {
+            display: none;
+            margin-top: 30px;
+            padding: 20px;
+            background: #fff3cd;
+            border-radius: 8px;
+            border: 1px solid #ffeeba;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: white;
+        }
+
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        /* Section B */
+        #section-b {
+            margin-top: 40px;
+            display: none;
+        }
+
+        .ans-card {
+            background: #fdfdfd;
+            border-left: 5px solid var(--secondary);
+            padding: 15px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .ans-text {
+            color: #444;
+            margin-top: 10px;
+            white-space: pre-wrap;
+            font-size: 15px;
+        }
+
+        .device-info {
+            font-size: 14px;
+            color: #555;
+            text-align: center;
+            margin-top: 10px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>CHEMISTRY MODEL PAPER - 1</h1>
+    <div class="header-info">
+        Time: 3 Hours + 15 Minutes | Total Marks: 70
+    </div>
+
+    <form id="quiz-form">
+        <h2>SECTION - A : Objective Type Questions (70 MCQs)</h2>
+        <div id="mcq-container">
+            <!-- Questions injected via JS -->
+        </div>
+
+        <div class="btn-container">
+            <button type="button" id="submit-btn" class="btn-submit">Submit Answers</button>
+            <button type="button" id="refresh-btn" class="btn-refresh">Refresh Rank List (Click 4x Fast)</button>
+        </div>
+    </form>
+
+    <!-- Results -->
+    <div id="results">
+        <p>Score: <span id="score-display">0</span> / 70</p>
+        <p>Percentage: <span id="percentage-display">0%</span></p>
+    </div>
+
+    <!-- Rank List Container -->
+    <div id="ranklist-container">
+        <h3>🏆 Online Rank List 🏆</h3>
+        <p id="user-device-info" class="device-info"></p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Rank</th>
+                    <th>User</th>
+                    <th>Score (%)</th>
+                    <th>Device Info</th>
+                </tr>
+            </thead>
+            <tbody id="ranklist-body">
+                <!-- Ranks injected here -->
+            </tbody>
+        </table>
+    </div>
+
+    <!-- SECTION B: Non-Objective -->
+    <div id="section-b">
+        <h2>SECTION - B : Non-Objective Type Questions</h2>
+        <div id="short-ans-container">
+            <h3>Short Answer Type Questions</h3>
+        </div>
+        <div id="long-ans-container">
+            <h3>Long Answer Type Questions</h3>
+        </div>
+    </div>
+
+</div>
+
+<script>
+    // --- ALL 70 MCQs DATA ---
+    const mcqData = [
+        { id: 1, q: "The solution which shows positive or negative deviation from Raoult's law is called :", options: { A: "Ideal solution", B: "True solution", C: "Non-ideal solution", D: "Colloidal solution" }, ans: "C" },
+        { id: 2, q: "Rust is :", options: { A: "Powdered iron", B: "Ferrous oxide", C: "Ferric oxide", D: "Hydrated ferric oxide" }, ans: "D" },
+        { id: 3, q: "The process of smelting involves reduction of metal oxide with :", options: { A: "Al", B: "C", C: "Mg", D: "S" }, ans: "B" },
+        { id: 4, q: "Which of the following has zero dipole moment ?", options: { A: "CH₃Cl", B: "CCl₄", C: "CH₂Cl₂", D: "CHCl₃" }, ans: "B" },
+        { id: 5, q: "Diethyl ether finds its use in medicine as :", options: { A: "pain killer", B: "hypnotic", C: "antiseptic", D: "anaesthetic" }, ans: "D" },
+        { id: 6, q: "Reaction of primary amine with chloroform in the presence of alcoholic KOH is called :", options: { A: "Hydrolysis", B: "Reduction", C: "Wurtz reaction", D: "Carbylamine reaction" }, ans: "D" },
+        { id: 7, q: "Which of the following is a disaccharide ?", options: { A: "Sucrose", B: "Glucose", C: "Fructose", D: "Starch" }, ans: "A" },
+        { id: 8, q: "An ore having two different metal atoms is :", options: { A: "Haematite", B: "Galena", C: "Magnetite", D: "Copper pyrite" }, ans: "D" },
+        { id: 9, q: "Which of the following has maximum number of unpaired electrons ?", options: { A: "Mg²⁺", B: "Ti³⁺", C: "V³⁺", D: "Fe³⁺" }, ans: "D" },
+        { id: 10, q: "When ethyl bromide is treated with dry silver oxide, then we get :", options: { A: "Diethyl ether", B: "Ethanal", C: "Ethane", D: "Ethene" }, ans: "A" },
+        { id: 11, q: "Alkyl halides form ethers by reacting with which of the following ?", options: { A: "Dry Ag₂O", B: "Moist Ag₂O", C: "Dry ZnO", D: "Moist ZnO" }, ans: "A" },
+        { id: 12, q: "Acetamide is :", options: { A: "Acidic", B: "Alkaline", C: "Amphoteric", D: "Neutral" }, ans: "C" },
+        { id: 13, q: "The osmotic pressure of a solution is represented by which of the following equations ?", options: { A: "π = CR/T", B: "π/C = RT", C: "π = CT/R", D: "π = RT/C" }, ans: "B" },
+        { id: 14, q: "Which of the following halogens does not exhibit a position oxidation state ?", options: { A: "I", B: "Br", C: "Cl", D: "F" }, ans: "D" },
+        { id: 15, q: "Which of the following is a ketohexose ?", options: { A: "Glucose", B: "Fructose", C: "Sucrose", D: "Starch" }, ans: "B" },
+        { id: 16, q: "Chloramine-T is a/an :", options: { A: "Disinfectant", B: "antiseptic", C: "Analgesic", D: "Antipyretic" }, ans: "A" },
+        { id: 17, q: "According to Freundlich adsorption isotherm :", options: { A: "x/m = kp^(1/n)", B: "m/x = k.p^(1/n)", C: "xm = kp^(1/n)", D: "x/m = k/p^(1/n)" }, ans: "A" },
+        { id: 18, q: "The IUPAC name of K₃[Fe(CN)₆] is :", options: { A: "Potassium ferrocyanide", B: "Potassium ferricyanide", C: "Potassium hexacyanoferrate (II)", D: "Potassium hexacyanoferrate (III)" }, ans: "D" },
+        { id: 19, q: "Which of the following is not an ideal solution ?", options: { A: "Benzene + Toluene", B: "Methyl alcohol + Ethyl alcohol", C: "Chloroform + Acetone", D: "Carbon tetrachloride + Silicone tetrachloride" }, ans: "C" },
+        { id: 20, q: "By which of the following processes colloidal sols are purified ?", options: { A: "Peptisation", B: "Coagulation", C: "Dialysis", D: "Flocculation" }, ans: "C" },
+        { id: 21, q: "The process of reduction of a metal oxide by carbon or carbon monoxide to the metal is called :", options: { A: "Smelting", B: "Roasting", C: "Calcination", D: "Leaching" }, ans: "A" },
+        { id: 22, q: "The oxidation number of Pt in [Pt(C₂H₄)Cl₃]⁻ is :", options: { A: "+1", B: "+2", C: "+3", D: "+4" }, ans: "B" },
+        { id: 23, q: "Alkyl halides are used for the preparation of which of the following ?", options: { A: "Alkane", B: "Alkene", C: "Alcohol", D: "All of these" }, ans: "D" },
+        { id: 24, q: "The IUPAC name of CH₃-CH(OH)-COOH is :", options: { A: "Lactic acid", B: "2-Hydroxy propanoic acid", C: "Propanoic acid", D: "None of these" }, ans: "B" },
+        { id: 25, q: "Which of the following diseases is caused due to the deficiency of Vitamin E ?", options: { A: "Beri-beri", B: "Scurvy", C: "Anti-fertility", D: "None of these" }, ans: "C" },
+        { id: 26, q: "Which of the following oxides shows ferro-magnetism ?", options: { A: "CrO₂", B: "MnO₂", C: "Fe₃O₄", D: "V₂O₅" }, ans: "A" },
+        { id: 27, q: "Which of the following is an amorphous solid ?", options: { A: "Graphite", B: "Quartz glass (SiO₂)", C: "Chrome alum", D: "Silicon carbide (SiC)" }, ans: "B" },
+        { id: 28, q: "Which of the following equations represents osmotic pressure ?", options: { A: "P = CRT", B: "P = CT/R", C: "P = RC/T", D: "P = RT/C" }, ans: "A" },
+        { id: 29, q: "pH of pure water is :", options: { A: "1", B: "4", C: "3", D: "7" }, ans: "D" },
+        { id: 30, q: "Osmotic pressure can be increased by :", options: { A: "Increasing temperature", B: "decreasing temperature", C: "increasing volume", D: "none" }, ans: "A" },
+        { id: 31, q: "Faraday's second law of electrolysis is related to :", options: { A: "Atomic number of cation", B: "Speed of cation", C: "Speed of anion", D: "Equivalent weight of electrolyte" }, ans: "D" },
+        { id: 32, q: "One Faraday electricity equal to how much Coulombs ?", options: { A: "96550", B: "96500", C: "96000", D: "95500" }, ans: "B" },
+        { id: 33, q: "Tyndall effect is not found is :", options: { A: "sugar solution", B: "colloidal solution of gold", C: "suspension", D: "emulsion" }, ans: "A" },
+        { id: 34, q: "Which of the following is an example of solid-solid system ?", options: { A: "Smoke", B: "Cake", C: "Synthetic gems", D: "Pumice stone" }, ans: "C" },
+        { id: 35, q: "Which one of the following is not an ore of zinc ?", options: { A: "Zinc blende", B: "Calamine", C: "Zincite", D: "Bauxite" }, ans: "D" },
+        { id: 36, q: "Ore of aluminium is :", options: { A: "bauxite", B: "hematite", C: "dolomite", D: "None of these" }, ans: "A" },
+        { id: 37, q: "The formula of blue vitriol is :", options: { A: "CuSO₄", B: "CuSO₄.5H₂O", C: "CaSO₄.2H₂O", D: "None" }, ans: "B" },
+        { id: 38, q: "The largest bond angle is found in which of the following ?", options: { A: "H₂O", B: "PH₃", C: "H₂S", D: "NH₃" }, ans: "B" },
+        { id: 39, q: "Element found from sea water is :", options: { A: "Magnesium", B: "Sodium", C: "Iodine", D: "none of these" }, ans: "C" },
+        { id: 40, q: "Which one of the following element is liquid at normal temperature ?", options: { A: "zinc", B: "mercury", C: "bromine", D: "water" }, ans: "B" },
+        { id: 41, q: "Which of the following is the strongest oxidizing agent?", options: { A: "F₂", B: "Cl₂", C: "I₂", D: "Br₂" }, ans: "A" },
+        { id: 42, q: "Which of the following is a tetrabasic acid ?", options: { A: "Hypophosphorous acid (H₃PO₂)", B: "Metaphosphoric acid (HPO₃)ₙ", C: "Pyrophosphoric acid (H₄P₂O₇)", D: "Orthophosphoric acid (H₃PO₄)" }, ans: "C" },
+        { id: 43, q: "Group I element of Periodic Table are known as :", options: { A: "Alkali metals", B: "Alkaline earth metals", C: "Inert gases", D: "None" }, ans: "A" },
+        { id: 44, q: "The strongest acid is :", options: { A: "HClO₄", B: "HClO₃", C: "HClO₂", D: "HClO" }, ans: "A" },
+        { id: 45, q: "What is the oxidation state of sulphur is SF₆ ?", options: { A: "+6", B: "-6", C: "+4", D: "-4" }, ans: "A" },
+        { id: 46, q: "Number of σ and π bonds in C₂ molecule is/are :", options: { A: "1σ and 1π", B: "1σ and 2π", C: "2π only", D: "1σ and 3π" }, ans: "C" },
+        { id: 47, q: "Copper is a member of :", options: { A: "First transition series", B: "Second transition series", C: "Third transition series", D: "Fourth transition series" }, ans: "A" },
+        { id: 48, q: "Which one of the following is called green vitriol ?", options: { A: "FeSO₄.7H₂O", B: "CuSO₄.5H₂O", C: "CaSO₄.2H₂O", D: "None of these" }, ans: "A" },
+        { id: 49, q: "When iron powder is added in CuSO₄ solution, the blue colour of solution turns :", options: { A: "Black", B: "Green", C: "Brown", D: "Colourless" }, ans: "B" },
+        { id: 50, q: "The element showing highest oxidation state among first transition series is :", options: { A: "Ni", B: "Cr", C: "Fe", D: "Mn" }, ans: "D" },
+        { id: 51, q: "Which of the following is known as red lead ?", options: { A: "Pb₃O₄", B: "Pb₂O₃", C: "PbO", D: "PbO₂" }, ans: "A" },
+        { id: 52, q: "Which metal nitrate gives colorless gas on thermal decomposition", options: { A: "NaNO₃", B: "Cu(NO₃)₂", C: "Ba(NO₃)₂", D: "Hg(NO₃)₂" }, ans: "B" },
+        { id: 53, q: "Which of the following compounds has tetrahedral geometry ?", options: { A: "[Ni(CN)₄]²⁻", B: "[Pd(CN)₄]²⁻", C: "[PdCl₄]²⁻", D: "[NiCl₄]²⁻" }, ans: "D" },
+        { id: 54, q: "The oxidation number of Fe in K₄[Fe(CN)₆] is :", options: { A: "+2", B: "+3", C: "-2", D: "-3" }, ans: "A" },
+        { id: 55, q: "The correct formula of hexamine platinum (IV) chloride is :", options: { A: "[Pt(NH₃)₆]Cl₄", B: "[Pt(NH₃)₆]Cl₂", C: "[Pt(NH₃)₂]Cl₃", D: "[Pt(NH₃)₆]Cl₆" }, ans: "A" },
+        { id: 56, q: "NaOH is:", options: { A: "Acid", B: "Base", C: "Salt", D: "All" }, ans: "B" },
+        { id: 57, q: "Alkene gives which of the following reactions ?", options: { A: "Addition reaction", B: "Substitution reaction", C: "Both 'A' and 'B'", D: "None of these" }, ans: "C" },
+        { id: 58, q: "The cannizzaro's reaction is not given by :", options: { A: "Formaldehyde", B: "Acetaldehyde", C: "Benzaldehyde", D: "Furfural" }, ans: "B" },
+        { id: 59, q: "Number of pi (π) bonds in aniline is :", options: { A: "0", B: "1", C: "2", D: "3" }, ans: "D" },
+        { id: 60, q: "CH₃CN on reduction gives :", options: { A: "CH₄", B: "CH₃COOH", C: "C₂H₅NH₂", D: "C₂H₅COOH" }, ans: "C" },
+        { id: 61, q: "Aniline reacts with Acetaldehyde to form :", options: { A: "Carbylamines", B: "Nitrobenzene", C: "Imine", D: "Schiffs base" }, ans: "D" },
+        { id: 62, q: "Which one of the following is natural polymer ?", options: { A: "Protein", B: "Nylon-6", C: "Buna-S", D: "Terrlene" }, ans: "A" },
+        { id: 63, q: "Vitamin A is known as :", options: { A: "Ascorbic acid", B: "Retinol", C: "Calciferol", D: "Tocopherol" }, ans: "B" },
+        { id: 64, q: "Which vitamin deficiency causes night blindness?", options: { A: "Vitamin A", B: "Vitamin B", C: "Vitamin C", D: "Vitamin D" }, ans: "A" },
+        { id: 65, q: "Hybridisation of carbon in ethane is :", options: { A: "sp³", B: "sp²", C: "sp", D: "sp³d²" }, ans: "A" },
+        { id: 66, q: "The reaction between alkyl halide and sodium metal is called :", options: { A: "Wurtz reaction", B: "Kolbe's reaction", C: "Clemmensen's reaction", D: "None of these" }, ans: "A" },
+        { id: 67, q: "The I.U.P.A.C. name of CH₃OC₂H₅ is :", options: { A: "Methoxy methane", B: "Ethoxy ethane", C: "Ethoxy methane", D: "None" }, ans: "D" },
+        { id: 68, q: "Which of the following is a formula of methoxy methane?", options: { A: "CH₃OCH₃", B: "CH₃COCH₃", C: "C₂H₅OCH₃", D: "C₂H₅COCH₃" }, ans: "A" },
+        { id: 69, q: "Ethanol when heated with excess of conc. H₂SO₄ at 170° C gives :", options: { A: "Ethane", B: "Ethene", C: "Dimeth yl ether", D: "Ethyl hydrogen Sulphate" }, ans: "B" },
+        { id: 70, q: "The name of acetone in IUPAC system is :", options: { A: "Methanal", B: "Ethanal", C: "Propanone", D: "Ethanone" }, ans: "C" }
+    ];
+
+    // --- SHORT & LONG ANSWERS ---
+    const shortAnsData = [
+        { id: 1, q: "What is metamerism ?", a: "Metamerism is a type of structural isomerism in which compounds have the same molecular formula but different arrangements of alkyl groups around a functional group. Example: Diethyl ether and Methyl propyl ether." },
+        { id: 2, q: "Discuss Faraday Second Law.", a: "The amount of substances deposited is directly proportional to their respective chemical equivalents. (x/E₁ = y/E₂ = z/E₃)." },
+        { id: 3, q: "Who are the members of halogen family ?", a: "Fluorine (F), Chlorine (Cl), Bromine (Br), Iodine (I) and Astatine (At)." },
+        { id: 4, q: "Bond angle of NH₃ is greater than in PH₃. Why ?", a: "Because electro-negativity of nitrogen is greater than phosphorus." },
+        { id: 5, q: "Explain the difference between a double salt and a complex salt.", a: "Double salt gives simple ions in water (e.g., Mohr's salt). Complex salt does not give simple ions in water (e.g., K₄[Fe(CN)₆])." },
+        { id: 6, q: "Define the following terms: (i) Mole fraction (ii) Molality (iii) Molarity (iv) Mass percentage", a: "(i) Ratio of moles of one component to total moles.\n(ii) Moles of solute per kg of solvent.\n(iii) Moles of solute per litre of solution.\n(iv) Mass of solute per 100g of solution." },
+        { id: 7, q: "What is salt bridge ? What are its uses ?", a: "A device used to connect the oxidation and reduction half-cells of a galvanic cell. It moves electrons from electrolyte solution to the other." },
+        { id: 8, q: "Define the zero order reaction. Give its unit.", a: "Rate of reaction is independent of the concentration of the reactants. Unit: mol L⁻¹ s⁻¹." },
+        { id: 9, q: "Give two methods for the preparation of colloids.", a: "(i) Condensation method (ii) Dispersion method." },
+        { id: 10, q: "What is demulsification ? Name two demulsifiers.", a: "Separating an emulsion into its constituent liquids. Techniques: boiling and centrifugation." },
+        { id: 11, q: "(a) Write the names of two ores of copper. (b) Which method is commonly used to extract copper.", a: "(a) Copper pyrites (CuFeS₂) and Copper glance (Cu₂S). (b) Froth Flotation process." },
+        { id: 12, q: "Define Electrometallurgy.", a: "The process of extraction of metals by electrolysis of their fused salts is called electrometallurgy." },
+        { id: 13, q: "How is cast iron differ from pig iron ?", a: "Pig iron contains about 4% carbon. Cast iron is obtained by melting pig iron with scrap iron and coke, contains slightly lower carbon (about 3%) and is extremely hard and brittle." },
+        { id: 14, q: "Why is red phosphorous less reactive than white phosphorous?", a: "White phosphorous is more reactive due to angular strain in tetrahedral P₄ molecule. Red phosphorous has a polymeric structure." },
+        { id: 15, q: "Explain why H₂S is a gas while H₂O is a liquid at room temperature.", a: "H₂O molecules are involved in intermolecular hydrogen bonding due to greater electronegativity difference. H₂S does not." },
+        { id: 16, q: "What are monosaccharides ?", a: "A carbohydrate that cannot be hydrolysed further to give simpler unit of polyhydroxy aldehyde or ketone. Examples: glucose, fructose." },
+        { id: 17, q: "What are biodegradable polymers? Give two examples.", a: "Polymers which can be broken down into smaller harmless molecules by enzyme-catalysed reactions. Examples: PHBV, Polylactic acid." },
+        { id: 18, q: "Explain the following terms giving one example of each type : (i) Antacids, (ii) Disinfectants", a: "(i) Substances which neutralise excess acid in stomach (e.g., Magnesium oxide). (ii) Substances capable of destroying microorganisms (e.g., 1% solution of phenol)." },
+        { id: 19, q: "HF is weaker than HI in acetic strength.", a: "Hydrogen iodide (HI) is more stronger acid than hydrogen fluoride because iodine (I) is more electropositive than Florine (F) and hence it can donate H⁺ more easily." },
+        { id: 20, q: "Define physical adsorption.", a: "If the adsorbate is held on a surface by the weak forces such as van der Waals' type, then the adsorption is called physical adsorption." }
+    ];
+
+    const longAnsData = [
+        { id: 21, q: "Write the comparison between Physisorption and Chemisorption.", a: "Physisorption: Low enthalpy (20-40 kJ/mol), van der Waals forces, low temp, not specific, multi-molecular layers, no activation energy, reversible.\nChemisorption: High enthalpy (40-400 kJ/mol), chemical bonds, high temp, highly specific, mono-molecular layer, requires activation energy, irreversible." },
+        { id: 22, q: "Write the following name reactions : (i) Kolbe's Schmidt Reaction (ii) Reimer-Tiemann Reaction", a: "(i) Kolbe's Schmidt: Sodium phenoxide + CO2 at 120-140°C/4-7 atm -> Sodium salicylate -> Salicylic acid.\n(ii) Reimer-Tiemann: Phenol + CHCl3 + NaOH at 340K -> o-hydroxybenzaldehyde." },
+        { id: 23, q: "Explain the main points in the extraction of zinc from zinc blende.", a: "(i) Concentration: Froth flotation.\n(ii) Roasting: ZnO.2ZnS + 3O₂ → 2ZnO + 2SO₂.\n(iii) Reduction: ZnO + C → Zn + CO.\n(iv) Purification: Electrolysis." },
+        { id: 24, q: "What happens when : (i) Acetone reacts with iodine and base. (ii) Acetylene is passed through red hot Cu-tube.", a: "(i) It liberates iodoform yellow ppt. (Reaction: Acetone + I₂ + NaOH -> Iodoform).\n(ii) Formation of benzene takes place." },
+        { id: 25, q: "Differentiate between DNA and RNA.", a: "DNA: Double stranded helix, Sugar is 2-deoxyribose, Uracil not present, Very large molecules (6-16 million), Replicates.\nRNA: Single stranded, Sugar is ribose, Thymine not present, Smaller molecules (20,000-40,000), Usually doesn't replicate." },
+        { id: 26, q: "Calculate the mass percentage of benzene and carbon tetrachloride if 22 g of benzene is dissolved in 122 g of carbon tetrachloride.", a: "Total mass of solution = 22 + 122 = 144 g.\nMass % of benzene = (22/144) × 100 = 15.28%\nMass % of CCl₄ = (122/144) × 100 = 84.72%" }
+    ];
+
+    // --- RENDER FUNCTIONS ---
+    const mcqContainer = document.getElementById('mcq-container');
+    
+    mcqData.forEach((item) => {
+        const qCard = document.createElement('div');
+        qCard.className = 'question-card';
+        
+        let optionsHTML = '';
+        for (const [key, value] of Object.entries(item.options)) {
+            optionsHTML += `
+                <label class="option-label" id="label-${item.id}-${key}">
+                    <input type="radio" name="q${item.id}" value="${key}">
+                    (${key}) ${value}
+                </label>
+            `;
+        }
+
+        qCard.innerHTML = `
+            <div class="question-text">${item.id}. ${item.q}</div>
+            <div class="options">${optionsHTML}</div>
+        `;
+        mcqContainer.appendChild(qCard);
+    });
+
+    // Render Section B
+    const shortContainer = document.getElementById('short-ans-container');
+    shortAnsData.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'ans-card';
+        card.innerHTML = `<strong>Q${item.id}: ${item.q}</strong><div class="ans-text">${item.a}</div>`;
+        shortContainer.appendChild(card);
+    });
+
+    const longContainer = document.getElementById('long-ans-container');
+    longAnsData.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'ans-card';
+        card.innerHTML = `<strong>Q${item.id}: ${item.q}</strong><div class="ans-text">${item.a}</div>`;
+        longContainer.appendChild(card);
+    });
+
+    // --- SUBMIT LOGIC ---
+    let userPercentage = 0;
+
+    document.getElementById('submit-btn').addEventListener('click', function() {
+        let score = 0;
+        const total = mcqData.length;
+        
+        document.querySelectorAll('input[type="radio"]').forEach(radio => radio.disabled = true);
+        this.disabled = true;
+
+        mcqData.forEach(item => {
+            const selected = document.querySelector(`input[name="q${item.id}"]:checked`);
+            const correctLabel = document.getElementById(`label-${item.id}-${item.ans}`);
+            
+            correctLabel.classList.add('correct-ans');
+
+            if (selected) {
+                const selectedLabel = document.getElementById(`label-${item.id}-${selected.value}`);
+                if (selected.value === item.ans) {
+                    score++;
+                } else {
+                    selectedLabel.classList.add('incorrect-ans');
+                }
+            }
+        });
+
+        userPercentage = Math.round((score / total) * 100);
+        
+        document.getElementById('score-display').innerText = score;
+        document.getElementById('percentage-display').innerText = userPercentage + '%';
+        
+        document.getElementById('results').style.display = 'block';
+        document.getElementById('section-b').style.display = 'block';
+        
+        // Auto scroll to results
+        document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+    });
+
+
+    // --- 4-CLICK RANK LIST LOGIC ---
+    let refreshClicks = 0;
+    let clickTimeout;
+    
+    document.getElementById('refresh-btn').addEventListener('click', function() {
+        refreshClicks++;
+        
+        clearTimeout(clickTimeout);
+        clickTimeout = setTimeout(() => {
+            refreshClicks = 0;
+        }, 800); // Must click 4 times within 800ms
+
+        if (refreshClicks === 4) {
+            showRankList();
+            refreshClicks = 0;
+        }
+    });
+
+    function showRankList() {
+        const rankContainer = document.getElementById('ranklist-container');
+        const tbody = document.getElementById('ranklist-body');
+        const deviceInfoElem = document.getElementById('user-device-info');
+
+        // Detect Device
+        const userAgent = navigator.userAgent;
+        let device = "Unknown Device";
+        if (userAgent.indexOf("Win") != -1) device = "Windows PC";
+        if (userAgent.indexOf("Mac") != -1) device = "Mac";
+        if (userAgent.indexOf("Linux") != -1) device = "Linux";
+        if (userAgent.indexOf("Android") != -1) device = "Android";
+        if (userAgent.indexOf("like Mac") != -1) device = "iOS";
+        
+        let browser = "Browser";
+        if(userAgent.indexOf("Chrome") != -1) browser = "Chrome";
+        else if(userAgent.indexOf("Firefox") != -1) browser = "Firefox";
+        else if(userAgent.indexOf("Safari") != -1) browser = "Safari";
+
+        const fullDeviceInfo = `${device} (${browser})`;
+        deviceInfoElem.innerText = `Your Device: ${fullDeviceInfo}`;
+
+        // Mock Online Data
+        let rankData = [
+            { name: "User Alpha (Online)", score: 85, device: "iPhone 13 (Safari)" },
+            { name: "User Beta (Online)", score: 92, device: "Samsung S22 (Chrome)" },
+            { name: "User Gamma (Online)", score: 45, device: "MacBook Pro (Safari)" },
+            { name: "User Delta (Online)", score: 70, device: "Windows 11 (Edge)" },
+        ];
+
+        // Add Current User
+        rankData.push({ name: "You (Current Device)", score: userPercentage, device: fullDeviceInfo, isCurrent: true });
+
+        // Sort by score
+        rankData.sort((a, b) => b.score - a.score);
+
+        tbody.innerHTML = '';
+        rankData.forEach((user, index) => {
+            const tr = document.createElement('tr');
+            if (user.isCurrent) {
+                tr.style.backgroundColor = '#d4edda';
+                tr.style.fontWeight = 'bold';
+            }
+            tr.innerHTML = `
+                <td>${index + 1}</td>
+                <td>${user.name}</td>
+                <td>${user.score}%</td>
+                <td>${user.device}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+
+        rankContainer.style.display = 'block';
+        rankContainer.scrollIntoView({ behavior: 'smooth' });
+    }
+</script>
+</body>
+</html>
