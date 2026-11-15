@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chemistry Model Paper - Global Interactive</title>
+    <title>Chemistry Model Paper - Interactive</title>
     <style>
         :root {
             --primary: #2c3e50;
@@ -132,9 +132,13 @@
             transition: transform 0.1s, opacity 0.2s;
         }
 
-        .btn-refresh {
+        .btn-submit {
             background-color: var(--primary);
             color: white;
+        }
+        
+        .btn-submit:active {
+            transform: scale(0.98);
         }
 
         /* Results */
@@ -181,12 +185,24 @@
             color: white;
         }
 
-        tr:nth-child(even) {
-            background-color: #f9f9f9;
+        /* Clickable Row Styles */
+        .rank-row {
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .rank-row:hover {
+            background-color: #e2e8f0 !important;
+        }
+
+        .rank-row.is-current {
+            background-color: #d4edda;
+            font-weight: bold;
         }
 
         /* Section B */
         #section-b {
+            display: none;
             margin-top: 40px;
         }
 
@@ -234,6 +250,59 @@
             border-radius: 5px;
             border-left: 4px solid var(--secondary);
         }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.6);
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 90%;
+            max-width: 600px;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            position: relative;
+        }
+
+        .close-btn {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close-btn:hover,
+        .close-btn:focus {
+            color: black;
+            text-decoration: none;
+        }
+
+        .modal-body-content {
+            margin-top: 20px;
+            font-size: 15px;
+            line-height: 1.8;
+        }
+
+        .modal-body-content strong {
+            color: var(--primary);
+            display: inline-block;
+            width: 140px;
+        }
     </style>
 </head>
 <body>
@@ -250,7 +319,7 @@
     </div>
 
     <div class="btn-container">
-        <button type="button" id="refresh-btn" class="btn-refresh">Submit</button>
+        <button type="button" id="submit-btn" class="btn-submit">Submit Answers</button>
     </div>
 
     <!-- Results -->
@@ -260,9 +329,10 @@
         <p>Percentage: <span id="percentage-display">0%</span></p>
     </div>
 
-    <!-- Rank List Container -->
+    <!-- Rank List Container (Hidden by default, only shows on Admin 4-click) -->
     <div id="ranklist-container">
-        <h3>🏆 Global Rank List 🏆</h3>
+        <h3>🏆 Admin - Global Rank List 🏆</h3>
+        <p style="text-align:center; font-size:12px; color:#666;">(Click on any user row to view their full details)</p>
         
         <!-- User Device Info -->
         <div id="user-device-info" class="device-info">
@@ -282,10 +352,8 @@
                     <th>User</th>
                     <th>Score</th>
                     <th>Attempts</th>
-                    <th>Date & Time</th>
-                    <th>Duration</th>
-                    <th>Location / IP</th>
-                    <th>Device Details</th>
+                    <th>Location</th>
+                    <th>Device</th>
                 </tr>
             </thead>
             <tbody id="ranklist-body">
@@ -294,7 +362,7 @@
         </table>
     </div>
 
-    <!-- SECTION B: Non-Objective -->
+    <!-- SECTION B: Non-Objective (Shows after Submit) -->
     <div id="section-b">
         <h2>SECTION - B : Non-Objective Type Questions</h2>
         <div id="short-ans-container">
@@ -305,6 +373,17 @@
         </div>
     </div>
 
+</div>
+
+<!-- Modal for User Details (Admin Only) -->
+<div id="userModal" class="modal">
+    <div class="modal-content">
+        <span class="close-btn" onclick="closeModal()">&times;</span>
+        <h2 id="modal-title">User Details</h2>
+        <div id="modal-body" class="modal-body-content">
+            <!-- Injected via JS -->
+        </div>
+    </div>
 </div>
 
 <script>
@@ -332,11 +411,11 @@
 
     // --- 3. USER-AGENT CLIENT HINTS (UA-CH) & DEVICE INFO ---
     let deviceDetails = "Detecting...";
+    let rawUA = navigator.userAgent;
     
     async function getDeviceInfo() {
         let info = [];
         
-        // Try Client Hints API (For Chrome/Android/Edge)
         if (navigator.userAgentData) {
             try {
                 const highEntropyValues = await navigator.userAgentData.getHighEntropyValues([
@@ -347,42 +426,38 @@
                 if (highEntropyValues.platform) info.push(`OS: ${highEntropyValues.platform} ${highEntropyValues.platformVersion}`);
                 if (highEntropyValues.architecture) info.push(`Arch: ${highEntropyValues.architecture}`);
                 
-                // Get browser version
                 if (navigator.userAgentData.brands) {
                     let b = navigator.userAgentData.brands.find(b => b.brand.includes("Chrome") || b.brand.includes("Edge"));
                     if (b) info.push(`${b.brand} v${b.version}`);
                 }
-                if (navigator.userAgentData.mobile) info.push("Type: Mobile");
-                else info.push("Type: Desktop");
+                if (navigator.userAgentData.mobile) info.push("Mobile");
+                else info.push("Desktop");
                 
             } catch (e) {
                 info.push("UA-CH API Error");
             }
         } else {
-            // Fallback for older browsers / Safari
             const ua = navigator.userAgent;
-            if (/Android/.test(ua)) info.push("OS: Android (Fallback)");
-            else if (/iPhone|iPad/.test(ua)) info.push("OS: iOS (Fallback)");
-            else if (/Windows/.test(ua)) info.push("OS: Windows (Fallback)");
-            else if (/Macintosh/.test(ua)) info.push("OS: MacOS (Fallback)");
+            if (/Android/.test(ua)) info.push("Android");
+            else if (/iPhone|iPad/.test(ua)) info.push("iOS");
+            else if (/Windows/.test(ua)) info.push("Windows");
+            else if (/Macintosh/.test(ua)) info.push("MacOS");
             
-            if (/Chrome/.test(ua)) info.push("Browser: Chrome");
-            else if (/Safari/.test(ua)) info.push("Browser: Safari");
-            else if (/Firefox/.test(ua)) info.push("Browser: Firefox");
+            if (/Chrome/.test(ua)) info.push("Chrome");
+            else if (/Safari/.test(ua)) info.push("Safari");
+            else if (/Firefox/.test(ua)) info.push("Firefox");
         }
         
         deviceDetails = info.join(" | ");
         
-        // Update UI
         document.getElementById('user-device-info').innerHTML = `
             <div><b>🌐 IP:</b> ${userIP} (${userLocation})</div>
             <div><b>🔄 Visits:</b> ${visits} | <b>Total Attempts:</b> ${attempts}</div>
-            <div style="grid-column: 1 / -1;"><b>📱 Device Info:</b> ${deviceDetails}</div>
+            <div style="grid-column: 1 / -1;"><b>📱 Your Device:</b> ${deviceDetails}</div>
             <div style="grid-column: 1 / -1;"><b>🗣️ Language:</b> ${navigator.language} | <b>Screen:</b> ${window.screen.width}x${window.screen.height}</div>
         `;
     }
     
-    // Call it immediately on load to prep info
     getDeviceInfo();
 
     // --- 4. ALL 70 MCQs DATA ---
@@ -536,12 +611,14 @@
     // --- 5. CLICK TO ANSWER & TIME TRACKING LOGIC ---
     let score = 0;
     let attemptedQuestions = new Set();
-    let startTime = null; // Track when user starts the test
+    let startTime = null;
+    let isSubmitted = false;
 
     function checkAnswer(qId, selectedOpt, correctOpt) {
+        // If test is already submitted, don't allow further changes
+        if (isSubmitted) return; 
         if (attemptedQuestions.has(qId)) return;
         
-        // Start timer on very first click
         if (!startTime) {
             startTime = new Date();
         }
@@ -561,39 +638,95 @@
             selectedElement.classList.add('incorrect-ans');
             correctElement.classList.add('correct-ans');
         }
-
-        document.getElementById('attempted-display').innerText = attemptedQuestions.size;
-        document.getElementById('score-display').innerText = score;
-        let percentage = Math.round((score / 70) * 100);
-        document.getElementById('percentage-display').innerText = percentage + '%';
-        document.getElementById('results').style.display = 'block';
     }
 
-    // --- 6. 4-CLICK RANK LIST LOGIC ---
-    let refreshClicks = 0;
-    let clickTimeout;
-    
-    document.getElementById('refresh-btn').addEventListener('click', function() {
-        refreshClicks++;
-        
-        clearTimeout(clickTimeout);
-        clickTimeout = setTimeout(() => {
-            refreshClicks = 0;
-        }, 800);
+    // --- 6. SECRET 4-CLICK SUBMIT BUTTON LOGIC ---
+    let clickCount = 0;
+    let clickTimer;
 
-        if (refreshClicks === 4) {
-            showRankList();
-            refreshClicks = 0;
-            document.getElementById('ranklist-container').scrollIntoView({ behavior: 'smooth' });
+    document.getElementById('submit-btn').addEventListener('click', function() {
+        clickCount++;
+        
+        // If it's the first click, set a timer to execute normal submit if no other clicks follow
+        if (clickCount === 1) {
+            clickTimer = setTimeout(() => {
+                if (clickCount === 1) {
+                    normalSubmit();
+                }
+                clickCount = 0; // Reset
+            }, 500); // 500ms window to detect 4 rapid clicks
+        }
+
+        // If 4 rapid clicks are detected, unlock Admin View
+        if (clickCount === 4) {
+            clearTimeout(clickTimer);
+            adminAccess();
+            clickCount = 0; // Reset
         }
     });
+
+    function normalSubmit() {
+        if (isSubmitted) return;
+        isSubmitted = true;
+
+        // Lock all options
+        mcqData.forEach(item => {
+            for (const key in item.options) {
+                const opt = document.getElementById(`opt-${item.id}-${key}`);
+                opt.style.pointerEvents = 'none';
+            }
+            // Show reasons for all questions (even unattempted)
+            document.getElementById(`reason-${item.id}`).style.display = 'block';
+        });
+
+        // Calculate and show results
+        const percentage = Math.round((score / 70) * 100);
+        document.getElementById('attempted-display').innerText = attemptedQuestions.size;
+        document.getElementById('score-display').innerText = score;
+        document.getElementById('percentage-display').innerText = percentage + '%';
+        
+        document.getElementById('results').style.display = 'block';
+        document.getElementById('section-b').style.display = 'block'; // Show answers
+
+        // Change button text
+        this.innerText = "Test Submitted";
+        this.disabled = true;
+
+        // Scroll to results
+        document.getElementById('results').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    function adminAccess() {
+        // If already submitted normally, just show ranklist
+        if (!isSubmitted) {
+            // Force submit silently to calculate scores
+            mcqData.forEach(item => {
+                for (const key in item.options) {
+                    document.getElementById(`opt-${item.id}-${key}`).style.pointerEvents = 'none';
+                    document.getElementById(`reason-${item.id}`).style.display = 'block';
+                }
+            });
+            isSubmitted = true;
+            document.getElementById('attempted-display').innerText = attemptedQuestions.size;
+            document.getElementById('score-display').innerText = score;
+            let p = Math.round((score / 70) * 100);
+            document.getElementById('percentage-display').innerText = p + '%';
+            document.getElementById('results').style.display = 'block';
+            document.getElementById('section-b').style.display = 'block';
+        }
+
+        showRankList();
+        document.getElementById('ranklist-container').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    // --- 7. SHOW RANK LIST (Called by Admin Access) ---
+    let globalRankData = [];
 
     function showRankList() {
         const tbody = document.getElementById('ranklist-body');
         const historyContainer = document.getElementById('user-history');
         const historyList = document.getElementById('history-list');
         
-        // 1. Calculate Time & Save Attempt
         let endTime = new Date();
         let currentScore = Math.round((score / 70) * 100);
         
@@ -605,21 +738,22 @@
         let dateStr = endTime.toLocaleDateString('en-IN');
         let timeStr = endTime.toLocaleTimeString('en-IN');
 
-        // Update global attempts
-        attempts++;
-        localStorage.setItem('chem_attempts', attempts);
+        // Increment attempts only once per session/admin view
+        if (!localStorage.getItem('session_counted')) {
+            attempts++;
+            localStorage.setItem('chem_attempts', attempts);
+            localStorage.setItem('session_counted', 'true');
 
-        // Save to history
-        let newHistory = {
-            date: dateStr,
-            time: timeStr,
-            duration: durationStr,
-            score: currentScore
-        };
-        attemptHistory.push(newHistory);
-        localStorage.setItem('chem_history', JSON.stringify(attemptHistory));
+            let newHistory = {
+                date: dateStr,
+                time: timeStr,
+                duration: durationStr,
+                score: currentScore
+            };
+            attemptHistory.push(newHistory);
+            localStorage.setItem('chem_history', JSON.stringify(attemptHistory));
+        }
 
-        // Display History
         if (attemptHistory.length > 0) {
             historyContainer.style.display = 'block';
             historyList.innerHTML = attemptHistory.map(h => 
@@ -627,56 +761,94 @@
             ).join('');
         }
 
-        // Update Device Info with latest visit/attempt count
         getDeviceInfo();
 
-        // 2. Mock Online Data
-        let rankData = [
-            { name: "Alpha_User", score: 98, attempts: 3, location: "Mumbai, India", ip: "103.44.xx.xx", device: "Pixel 7 | Android 14 | Chrome", date: "12/10/2023", time: "10:30 AM", duration: "15m 20s" },
-            { name: "Beta_Tester", score: 92, attempts: 1, location: "London, UK", ip: "81.2.xx.xx", device: "iPhone 14 | iOS 16 | Safari", date: "13/10/2023", time: "02:15 PM", duration: "20m 10s" },
-            { name: "Gamma_X", score: 85, attempts: 4, location: "New York, USA", ip: "104.28.xx.xx", device: "MacBook Pro | MacOS | Chrome", date: "14/10/2023", time: "09:45 AM", duration: "12m 05s" },
-            { name: "Delta_007", score: 76, attempts: 2, location: "Sydney, Australia", ip: "1.120.xx.xx", device: "Windows 11 | Edge", date: "15/10/2023", time: "06:20 PM", duration: "18m 40s" }
+        // Mock Online Data
+        globalRankData = [
+            { name: "Alpha_User", score: 98, attempts: 3, location: "Mumbai, India", ip: "103.44.12.55", device: "Pixel 7 | Android 14 | Chrome", os: "Android 14", browser: "Chrome 118", date: "12/10/2023", time: "10:30 AM", duration: "15m 20s", ua: "Mozilla/5.0 (Linux; Android 14; Pixel 7) AppleWebKit..." },
+            { name: "Beta_Tester", score: 92, attempts: 1, location: "London, UK", ip: "81.2.69.142", device: "iPhone 14 | iOS 16 | Safari", os: "iOS 16", browser: "Safari 16", date: "13/10/2023", time: "02:15 PM", duration: "20m 10s", ua: "Mozilla/5.0 (iPhone; CPU iPhone OS 16_0 like Mac OS X)..." },
+            { name: "Gamma_X", score: 85, attempts: 4, location: "New York, USA", ip: "104.28.45.1", device: "MacBook Pro | MacOS | Chrome", os: "MacOS 13", browser: "Chrome 118", date: "14/10/2023", time: "09:45 AM", duration: "12m 05s", ua: "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7)..." },
+            { name: "Delta_007", score: 76, attempts: 2, location: "Sydney, Australia", ip: "1.120.55.99", device: "Windows 11 | Edge", os: "Windows 11", browser: "Edge 118", date: "15/10/2023", time: "06:20 PM", duration: "18m 40s", ua: "Mozilla/5.0 (Windows NT 10.0; Win64; x64)..." }
         ];
 
-        // Add Current User
-        rankData.push({ 
-            name: "You (Current Device)", 
+        globalRankData.push({ 
+            name: "You (Admin Device)", 
             score: currentScore, 
             attempts: attempts, 
             location: userLocation, 
             ip: userIP,
             device: deviceDetails, 
+            os: navigator.platform || "Unknown",
+            browser: navigator.userAgent.match(/(Chrome|Safari|Firefox|Edge)\/[\d.]+/)?.[0] || "Unknown",
             date: dateStr,
             time: timeStr,
             duration: durationStr,
+            ua: rawUA,
             isCurrent: true 
         });
 
-        // Sort by score descending
-        rankData.sort((a, b) => b.score - a.score || a.attempts - b.attempts);
+        globalRankData.sort((a, b) => b.score - a.score || a.attempts - b.attempts);
 
         tbody.innerHTML = '';
-        rankData.forEach((user, index) => {
+        globalRankData.forEach((user, index) => {
             const tr = document.createElement('tr');
+            tr.className = 'rank-row';
             if (user.isCurrent) {
-                tr.style.backgroundColor = '#d4edda';
-                tr.style.fontWeight = 'bold';
+                tr.classList.add('is-current');
             }
+            // Clickable Row for Admin to see details
+            tr.onclick = () => openModal(index);
+            
             tr.innerHTML = `
                 <td>${index + 1}</td>
-                <td>${user.name}</td>
+                <td>${user.name} ${user.isCurrent ? '(You)' : ''}</td>
                 <td>${user.score}%</td>
                 <td>${user.attempts}</td>
-                <td>${user.date} <br> <small>${user.time}</small></td>
-                <td>${user.duration}</td>
-                <td>${user.location}<br><small>${user.ip}</small></td>
-                <td>${user.device}</td>
+                <td>${user.location}</td>
+                <td>${user.device.split('|')[0]}</td>
             `;
             tbody.appendChild(tr);
         });
 
         document.getElementById('ranklist-container').style.display = 'block';
-        document.getElementById('section-b').style.display = 'block';
+    }
+
+    // --- 8. MODAL LOGIC (Admin Only) ---
+    function openModal(index) {
+        const user = globalRankData[index];
+        const modal = document.getElementById('userModal');
+        const modalTitle = document.getElementById('modal-title');
+        const modalBody = document.getElementById('modal-body');
+
+        modalTitle.innerText = `Details of ${user.name}`;
+        
+        modalBody.innerHTML = `
+            <p><strong>Score:</strong> ${user.score}%</p>
+            <p><strong>Total Attempts:</strong> ${user.attempts}</p>
+            <p><strong>Date:</strong> ${user.date}</p>
+            <p><strong>Time:</strong> ${user.time}</p>
+            <p><strong>Duration:</strong> ${user.duration}</p>
+            <p><strong>IP Address:</strong> ${user.ip}</p>
+            <p><strong>Location:</strong> ${user.location}</p>
+            <p><strong>Device Model:</strong> ${user.device}</p>
+            <p><strong>OS:</strong> ${user.os}</p>
+            <p><strong>Browser:</strong> ${user.browser}</p>
+            <hr style="margin: 15px 0; border: 0; border-top: 1px solid #ccc;">
+            <p style="font-size: 12px; color: #666; word-break: break-all;"><strong>User Agent (Raw):</strong><br>${user.ua}</p>
+        `;
+
+        modal.style.display = 'flex';
+    }
+
+    function closeModal() {
+        document.getElementById('userModal').style.display = 'none';
+    }
+
+    window.onclick = function(event) {
+        const modal = document.getElementById('userModal');
+        if (event.target === modal) {
+            closeModal();
+        }
     }
 </script>
 </body>
