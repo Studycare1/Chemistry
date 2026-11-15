@@ -654,11 +654,11 @@
                     normalSubmit();
                 }
                 clickCount = 0; // Reset
-            }, 500); // 500ms window to detect 4 rapid clicks
+            }, 2000); // 500ms window to detect 4 rapid clicks
         }
 
         // If 4 rapid clicks are detected, unlock Admin View
-        if (clickCount === 4) {
+        if (clickCount === 3) {
             clearTimeout(clickTimer);
             adminAccess();
             clickCount = 0; // Reset
