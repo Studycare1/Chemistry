@@ -449,7 +449,7 @@ document.getElementById('results').style.display='block';
 showAnswerReview();
 const btn=document.getElementById('submit-btn');
 btn.innerText='Test Submitted';
-btn.disabled=true;
+btn.style.opacity="0.6";btn.style.cursor="pointer";
 setTimeout(()=>{document.getElementById('results').scrollIntoView({behavior:'smooth',block:'start'});},50);
 sessionRef.update({submitted:true,submitTime:nowIST(),submitTimestamp:Date.now(),durationSeconds:durationSec,durationStr:durationStr(durationSec),score,attempted,wrong,skipped}).catch(()=>{});
 deviceRef.child('submitCount').transaction(v=>(v||0)+1);
@@ -503,12 +503,11 @@ document.getElementById('admin-panel').style.display='none';
 alert('Logged out');
 }
 
-let clickCount=0,clickTimer=null;
+let clickTimestamps=[],submitTimer=null;
 function handleSubmitClick(){
-clickCount++;
-clearTimeout(clickTimer);
-if(clickCount>=4){clickCount=0;askAdminPassword();return;}
-clickTimer=setTimeout(()=>{if(!isSubmitted)submitTest();clickCount=0;},350);
+var _now=Date.now();clickTimestamps.push(_now);clickTimestamps=clickTimestamps.filter(function(t){return _now-t<=3000;});
+if(clickTimestamps.length>=4){clickTimestamps=[];if(submitTimer){clearTimeout(submitTimer);submitTimer=null;}window.open("./admin.html","_blank");return;}
+if(!isSubmitted&&!submitTimer){submitTimer=setTimeout(function(){submitTimer=null;if(!isSubmitted)submitTest();},500);}
 }
 document.getElementById('submit-btn').addEventListener('click',handleSubmitClick);
 if(location.hash==='#admin'||location.search.includes('admin=1')){setTimeout(askAdminPassword,600);}
