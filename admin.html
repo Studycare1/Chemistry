@@ -39,7 +39,7 @@ body{font-family:'Segoe UI',system-ui,sans-serif;background:linear-gradient(135d
 .toolbar .count{color:#818cf8;font-size:12px;font-weight:700;margin-left:auto}
 table{width:100%;border-collapse:collapse;font-size:12px;min-width:900px}
 th{background:#0f172a;color:#cbd5e1;padding:10px 6px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
-td{padding:9px 6px;border-bottom:1px solid #334155;color:#e2e8f0}
+td{padding:9px 6px;border-bottom:1px solid #334155;color:#e2e8f0;vertical-align:middle;}
 tr.r{cursor:pointer}
 tr.r:hover{background:#334155}
 .dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
@@ -58,8 +58,9 @@ tr.r:hover{background:#334155}
 .modal h2{color:#818cf8;margin-bottom:14px;font-size:18px;padding-right:30px}
 .info-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 20px;margin-bottom:16px;padding:14px;background:#0f172a;border-radius:12px}
 @media(max-width:600px){.info-grid{grid-template-columns:1fr}}
-.info-grid p{font-size:12px;color:#cbd5e1}
+.info-grid p{font-size:12px;color:#cbd5e1;line-height:1.5;}
 .info-grid b{color:#818cf8}
+.raw-ua{grid-column:1/-1;font-size:11px;color:#94a3b8;background:#1e293b;padding:8px;border-radius:6px;word-break:break-all;font-family:monospace;margin-top:8px;}
 .session-card{background:#0f172a;border-left:4px solid #6366f1;padding:14px;border-radius:12px;margin-bottom:12px}
 .session-card h4{color:#e2e8f0;font-size:13px;margin-bottom:8px}
 .session-details{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:6px;font-size:11px;margin-bottom:10px}
@@ -102,7 +103,7 @@ tr.r:hover{background:#334155}
 
 <div id="dashboard" class="dash" style="display:none">
 <div class="header">
-<h1>📊 StudyCare Admin Dashboard</h1>
+<h1>📊 StudyCare Admin</h1>
 <div class="header-btns">
 <button class="b-export" onclick="exportCSV()">📥 CSV</button>
 <button class="b-refresh" onclick="loadData()">🔄 Refresh</button>
@@ -110,21 +111,18 @@ tr.r:hover{background:#334155}
 </div>
 </div>
 <div class="stats">
-<div class="stat s-purple"><div class="stat-num" id="sDevices">0</div><div class="stat-lbl">Devices</div></div>
-<div class="stat s-green"><div class="stat-num" id="sActive">0</div><div class="stat-lbl">Active 5m</div></div>
-<div class="stat s-orange"><div class="stat-num" id="sVisits">0</div><div class="stat-lbl">Visits</div></div>
+<div class="stat s-purple"><div class="stat-num" id="sDevices">0</div><div class="stat-lbl">Total Devices</div></div>
+<div class="stat s-green"><div class="stat-num" id="sActive">0</div><div class="stat-lbl">Active Now</div></div>
+<div class="stat s-orange"><div class="stat-num" id="sVisits">0</div><div class="stat-lbl">Total Visits</div></div>
 <div class="stat s-red"><div class="stat-num" id="sSubmits">0</div><div class="stat-lbl">Submissions</div></div>
-<div class="stat"><div class="stat-num" id="sBest">0</div><div class="stat-lbl">Best</div></div>
-<div class="stat"><div class="stat-num" id="sAvg">0</div><div class="stat-lbl">Avg</div></div>
+<div class="stat"><div class="stat-num" id="sBest">0</div><div class="stat-lbl">Best Score</div></div>
 </div>
 <div class="tabs">
 <button class="tab active" data-tab="devices" onclick="showTab('devices')">📱 Devices</button>
 <button class="tab" data-tab="submissions" onclick="showTab('submissions')">📝 Submissions</button>
-<button class="tab" data-tab="utm" onclick="showTab('utm')">📈 UTM Report</button>
 </div>
 <div id="tab-devices" class="content"><div class="loading">Loading...</div></div>
 <div id="tab-submissions" class="content" style="display:none"></div>
-<div id="tab-utm" class="content" style="display:none"></div>
 </div>
 
 <div id="modal" class="modal"><div class="modal-box"><button class="modal-close" onclick="closeModal()">×</button><div id="modalBody"></div></div></div>
@@ -138,7 +136,7 @@ const ADMIN_PASSWORD='@1234@';
 const SESSION_KEY='sc_admin_dash_session';
 const SESSION_TIMEOUT=30*60*1000;
 
-const QMAP={1:"Raoult's law deviation",2:"Rust formula",3:"Smelting reducing agent",4:"Zero dipole moment",5:"Diethyl ether use",6:"Carbylamine reaction",7:"Disaccharide",8:"Ore with two metals",9:"Max unpaired electrons",10:"Ethyl bromide + Ag2O",11:"Ether formation",12:"Acetamide nature",13:"Osmotic pressure eq",14:"Halogen oxidation",15:"Ketohexose",16:"Chloramine-T",17:"Freundlich isotherm",18:"K3[Fe(CN)6] IUPAC",19:"Non-ideal solution",20:"Colloid purification",21:"Smelting definition",22:"Pt oxidation in complex",23:"Alkyl halide uses",24:"CH3CH(OH)COOH IUPAC",25:"Vitamin E deficiency",26:"Ferromagnetic oxide",27:"Amorphous solid",28:"Osmotic pressure eq 2",29:"pH of water",30:"Osmotic pressure increase",31:"Faraday 2nd law",32:"1 Faraday Coulombs",33:"Tyndall effect",34:"Solid-solid system",35:"Not zinc ore",36:"Aluminium ore",37:"Blue vitriol",38:"Largest bond angle",39:"Sea water element",40:"Liquid at room temp",41:"Strongest oxidizer",42:"Tetrabasic acid",43:"Group I name",44:"Strongest acid",45:"S oxidation in SF6",46:"C2 sigma pi bonds",47:"Copper transition",48:"Green vitriol",49:"Fe + CuSO4 color",50:"Highest oxidation 1st series",51:"Red lead",52:"Colorless gas nitrate",53:"Tetrahedral complex",54:"Fe oxidation in K4[Fe(CN)6]",55:"Hexamine Pt(IV) chloride",56:"NaOH type",57:"Alkene reactions",58:"No Cannizzaro",59:"Aniline pi bonds",60:"CH3CN reduction",61:"Aniline + Acetaldehyde",62:"Natural polymer",63:"Vitamin A name",64:"Night blindness vitamin",65:"Ethane hybridisation",66:"Alkyl halide + Na",67:"CH3OC2H5 IUPAC",68:"Methoxy methane formula",69:"Ethanol + H2SO4 170C",70:"Acetone IUPAC"};
+const QMAP={1:"Raoult's law",2:"Rust",3:"Smelting",4:"Dipole moment",5:"Diethyl ether",6:"Carbylamine",7:"Disaccharide",8:"Ore",9:"Unpaired e-",10:"Ethyl bromide+Ag2O",11:"Ether",12:"Acetamide",13:"Osmotic pressure",14:"Halogen oxidation",15:"Ketohexose",16:"Chloramine-T",17:"Freundlich",18:"K3[Fe(CN)6]",19:"Non-ideal",20:"Dialysis",21:"Smelting def",22:"Pt oxidation",23:"Alkyl halide",24:"Lactic acid",25:"Vit E deficiency",26:"CrO2",27:"Amorphous",28:"P=CRT",29:"pH 7",30:"Temp increases",31:"Faraday 2nd",32:"96500",33:"Tyndall",34:"Gems",35:"Bauxite",36:"Bauxite",37:"CuSO4.5H2O",38:"PH3 angle",39:"Iodine",40:"Mercury",41:"F2",42:"Pyrophosphoric",43:"Alkali",44:"HClO4",45:"+6",46:"2pi",47:"Cu 1st series",48:"FeSO4.7H2O",49:"Green",50:"Mn",51:"Pb3O4",52:"Cu(NO3)2",53:"[NiCl4]2-",54:"+2",55:"[Pt(NH3)6]Cl4",56:"Base",57:"Both",58:"Acetaldehyde",59:"3",60:"C2H5NH2",61:"Schiffs",62:"Protein",63:"Retinol",64:"Vit A",65:"sp3",66:"Wurtz",67:"None",68:"CH3OCH3",69:"Ethene",70:"Propanone"};
 
 let allDevices=[],currentTab='devices',autoRefreshTimer=null;
 
@@ -203,11 +201,11 @@ document.getElementById('tab-devices').innerHTML='<div class="empty">Error: '+es
 }
 
 function renderStats(){
-var visits=0,submits=0,best=0,scores=[],active=0;
+var visits=0,submits=0,best=0,active=0;
 allDevices.forEach(function(d){
 visits+=d.visitCount||0;
 submits+=d.submitCount||0;
-if(d.bestScore){best=Math.max(best,d.bestScore);scores.push(d.bestScore);}
+if(d.bestScore)best=Math.max(best,d.bestScore);
 if(isOnline(d))active++;
 });
 document.getElementById('sDevices').textContent=allDevices.length;
@@ -215,7 +213,6 @@ document.getElementById('sActive').textContent=active;
 document.getElementById('sVisits').textContent=visits;
 document.getElementById('sSubmits').textContent=submits;
 document.getElementById('sBest').textContent=best;
-document.getElementById('sAvg').textContent=scores.length?Math.round(scores.reduce(function(a,b){return a+b;},0)/scores.length):0;
 }
 
 function showTab(name){
@@ -223,7 +220,7 @@ currentTab=name;
 document.querySelectorAll('.tab').forEach(function(t){
 t.classList.toggle('active',t.getAttribute('data-tab')===name);
 });
-['devices','submissions','utm'].forEach(function(n){
+['devices','submissions'].forEach(function(n){
 document.getElementById('tab-'+n).style.display=(n===name?'block':'none');
 });
 renderCurrentTab();
@@ -232,7 +229,6 @@ renderCurrentTab();
 function renderCurrentTab(){
 if(currentTab==='devices')renderDevices();
 else if(currentTab==='submissions')renderSubmissions();
-else if(currentTab==='utm')renderUTM();
 }
 
 function renderDevices(){
@@ -257,7 +253,6 @@ return'<tr class="r" onclick="openDevice(\''+d.key+'\')">'+
 '<td>'+(d.visitCount||0)+'</td>'+
 '<td>'+(d.submitCount||0)+'</td>'+
 '<td class="'+scoreClass(d.bestScore||0,70)+'">'+(d.bestScore||0)+'</td>'+
-'<td>'+(d.lastScore!==undefined?d.lastScore:'-')+'</td>'+
 '<td style="text-align:left;font-size:10px;"><b style="color:#a5b4fc;">'+esc(info.device||'Unknown')+'</b><br><span style="color:#94a3b8;">'+(info.location||'—')+'</span></td>'+
 '<td style="font-size:10px;color:#94a3b8;">'+(info.lastSeen||'—')+'</td>'+
 '</tr>';
@@ -267,7 +262,7 @@ wrap.innerHTML='<div class="toolbar">'+
 '<input type="text" id="devSearch" placeholder="Search device/source..." oninput="filterDevices()" style="flex:1;min-width:200px;max-width:300px;">'+
 '<span class="count" id="devCount">'+sorted.length+' devices</span>'+
 '</div>'+
-'<table><thead><tr><th>#</th><th>Device ID</th><th>Live</th><th>Source</th><th>Visits</th><th>Submits</th><th>Best</th><th>Last</th><th>Device / Location</th><th>Last Seen</th></tr></thead><tbody>'+rows+'</tbody></table>';
+'<table><thead><tr><th>#</th><th>Device ID</th><th>Live</th><th>Source</th><th>Visits</th><th>Submits</th><th>Best</th><th>Device / Location</th><th>Last Seen</th></tr></thead><tbody>'+rows+'</tbody></table>';
 }
 
 function filterDevices(){
@@ -324,9 +319,7 @@ return'<tr class="r" onclick="openSubmission(\''+s.deviceId+'\',\''+s.sessionId+
 '<td class="'+scoreClass(s.score,70)+'" style="font-size:14px;">'+s.score+'<span style="font-size:10px;color:#64748b;">/70</span></td>'+
 '<td>'+s.attempted+'</td>'+
 '<td style="color:#ef4444;">'+s.wrong+'</td>'+
-'<td style="color:#94a3b8;">'+s.skipped+'</td>'+
 '<td>'+s.durationStr+'</td>'+
-'<td style="color:#f59e0b;font-weight:700;">'+s.clicksCount+'</td>'+
 '</tr>';
 }).join('');
 
@@ -334,7 +327,7 @@ wrap.innerHTML='<div class="toolbar">'+
 '<input type="text" id="subSearch" placeholder="Search device/source..." oninput="filterSubmissions()" style="flex:1;min-width:200px;max-width:300px;">'+
 '<span class="count" id="subCount">'+subs.length+' submissions</span>'+
 '</div>'+
-'<table><thead><tr><th>#</th><th>Submitted</th><th>Device</th><th>Source</th><th>Score</th><th>Att</th><th>Wrong</th><th>Skipped</th><th>Duration</th><th>Clicks</th></tr></thead><tbody>'+rows+'</tbody></table>';
+'<table><thead><tr><th>#</th><th>Time</th><th>Device</th><th>Source</th><th>Score</th><th>Att</th><th>Wrong</th><th>Duration</th></tr></thead><tbody>'+rows+'</tbody></table>';
 }
 
 function filterSubmissions(){
@@ -347,92 +340,6 @@ if(!q||t.indexOf(q)>=0){r.style.display='';visible++;}
 else{r.style.display='none';}
 });
 document.getElementById('subCount').textContent=visible+' submissions';
-}
-
-function renderUTM(){
-var wrap=document.getElementById('tab-utm');
-
-var sources={},campaigns={},days={},scores={};
-allDevices.forEach(function(d){
-var info=d.info||{};
-var utm=info.utm||{};
-var src=utm.utm_source||'direct';
-if(!sources[src])sources[src]={devices:0,visits:0,submits:0,lastSeen:''};
-sources[src].devices++;
-sources[src].visits+=(d.visitCount||0);
-sources[src].submits+=(d.submitCount||0);
-if(!scores[src])scores[src]=[];
-if(d.bestScore)scores[src].push(d.bestScore);
-if(info.lastSeen&&(!sources[src].lastSeen||info.lastSeen>sources[src].lastSeen))sources[src].lastSeen=info.lastSeen;
-
-if(utm.utm_campaign){
-var c=utm.utm_campaign;
-if(!campaigns[c])campaigns[c]={devices:0,visits:0,submits:0,source:src};
-campaigns[c].devices++;
-campaigns[c].visits+=(d.visitCount||0);
-campaigns[c].submits+=(d.submitCount||0);
-}
-
-if(d.utm_visits){
-Object.values(d.utm_visits).forEach(function(v){
-if(!v.date||!v.source)return;
-if(!days[v.date])days[v.date]={};
-if(!days[v.date][v.source])days[v.date][v.source]={devices:{},visits:0};
-days[v.date][v.source].devices[d.key]=true;
-days[v.date][v.source].visits++;
-});
-}
-});
-
-// Source summary
-var srcRows=Object.entries(sources).sort(function(a,b){return b[1].devices-a[1].devices;});
-var maxDev=srcRows.length?srcRows[0][1].devices:1;
-var srcHTML='<div class="report-section"><div class="report-title">📊 Source Summary (All Time)</div>';
-srcRows.forEach(function(e){
-var n=e[0],s=e[1];
-var avg=scores[n]&&scores[n].length?Math.round(scores[n].reduce(function(a,b){return a+b;},0)/scores[n].length):0;
-srcHTML+='<div class="bar-row"><span class="bar-label">'+srcBadge(n)+'</span><div class="bar" style="width:'+Math.max(2,(s.devices/maxDev)*300)+'px;"></div><span class="bar-val">'+s.devices+' dev · '+s.visits+' vis · '+s.submits+' sub · avg '+avg+'</span></div>';
-});
-srcHTML+='</div>';
-
-// Daily breakdown
-var allDates=Object.keys(days).sort().reverse().slice(0,14);
-var allSrc=Object.keys(sources).sort();
-var dailyHTML='<div class="report-section"><div class="report-title">📅 Daily Breakdown (Last 14 Days)</div>';
-if(allDates.length===0){
-dailyHTML+='<div class="empty">No UTM visits yet. Share links with ?utm_source=whatsapp etc.</div>';
-}else{
-dailyHTML+='<table class="report-table"><thead><tr><th>Date</th>';
-allSrc.forEach(function(s){dailyHTML+='<th style="text-align:center;">'+s+'</th>';});
-dailyHTML+='<th style="text-align:center;">Total</th></tr></thead><tbody>';
-allDates.forEach(function(date){
-var dayData=days[date]||{};
-var total=0;var cells='';
-allSrc.forEach(function(s){
-var cnt=dayData[s]?Object.keys(dayData[s].devices).length:0;
-total+=cnt;
-cells+='<td class="daily-td" style="color:'+(cnt>0?'#10b981':'#475569')+';">'+(cnt>0?cnt:'—')+'</td>';
-});
-var dStr=date.slice(8)+'/'+date.slice(5,7)+'/'+date.slice(0,4);
-dailyHTML+='<tr><td style="font-weight:600;">'+dStr+'</td>'+cells+'<td class="daily-td" style="color:#818cf8;">'+(total||'—')+'</td></tr>';
-});
-dailyHTML+='</tbody></table>';
-}
-dailyHTML+='</div>';
-
-// Campaigns
-var campRows=Object.entries(campaigns).sort(function(a,b){return b[1].devices-a[1].devices;});
-var campHTML='';
-if(campRows.length>0){
-campHTML='<div class="report-section"><div class="report-title">🎯 Campaigns</div>';
-campHTML+='<table class="report-table"><thead><tr><th>Campaign</th><th>Source</th><th>Devices</th><th>Visits</th><th>Submits</th></tr></thead><tbody>';
-campRows.forEach(function(e){
-campHTML+='<tr><td style="color:#fbbf24;font-weight:600;">'+esc(e[0])+'</td><td>'+srcBadge(e[1].source)+'</td><td>'+e[1].devices+'</td><td>'+e[1].visits+'</td><td>'+e[1].submits+'</td></tr>';
-});
-campHTML+='</tbody></table></div>';
-}
-
-wrap.innerHTML=srcHTML+dailyHTML+campHTML;
 }
 
 function openDevice(key){
@@ -469,20 +376,24 @@ document.getElementById('modal').classList.add('open');
 function renderDeviceDetail(d){
 var info=d.info||{};
 var utm=info.utm||{};
-var html='<h2>Device: '+esc(d.key)+'</h2>';
+// Adding EXTREMELY DETAILED INFO as requested
+var html='<h2>Full Device Info: '+esc(d.key)+'</h2>';
 html+='<div class="info-grid">'+
 '<p><b>Device ID:</b> '+esc(d.key)+'</p>'+
-'<p><b>Model:</b> '+esc(info.device||'Unknown')+'</p>'+
-'<p><b>OS:</b> '+esc(info.os||'Unknown')+'</p>'+
-'<p><b>IP:</b> '+esc(info.ip||'—')+'</p>'+
+'<p><b>Status:</b> '+(isOnline(d)?'🟢 Online':'⚪ Offline')+'</p>'+
+'<p><b>Model/Device:</b> '+esc(info.device||'Unknown')+'</p>'+
+'<p><b>OS / Platform:</b> '+esc(info.os||'Unknown')+'</p>'+
+'<p><b>IP Address:</b> '+esc(info.ip||'—')+'</p>'+
 '<p><b>Location:</b> '+esc(info.location||'—')+'</p>'+
-'<p><b>Source:</b> '+srcBadge(utm.utm_source)+'</p>'+
-'<p><b>Campaign:</b> '+esc(utm.utm_campaign||'—')+'</p>'+
-'<p><b>Medium:</b> '+esc(utm.utm_medium||'—')+'</p>'+
+'<p><b>Screen Resolution:</b> '+esc(info.screen||'Not saved (Old Version)')+'</p>'+
+'<p><b>Browser Language:</b> '+esc(info.lang||'Not saved (Old Version)')+'</p>'+
+'<p><b>UTM Source:</b> '+srcBadge(utm.utm_source)+'</p>'+
+'<p><b>UTM Campaign:</b> '+esc(utm.utm_campaign||'—')+'</p>'+
 '<p><b>First Seen:</b> '+esc(info.firstSeen||'—')+'</p>'+
 '<p><b>Last Seen:</b> '+esc(info.lastSeen||'—')+'</p>'+
-'<p><b>Visits:</b> '+(d.visitCount||0)+' · Submits: '+(d.submitCount||0)+' · Best: '+(d.bestScore||0)+'</p>'+
-'<p><b>Status:</b> '+(isOnline(d)?'🟢 Online':'⚪ Offline')+'</p>'+
+'<p><b>Visits:</b> '+(d.visitCount||0)+'</p>'+
+'<p><b>Submissions:</b> '+(d.submitCount||0)+'</p>'+
+'<div class="raw-ua"><b>RAW USER AGENT:</b><br>'+esc(info.ua||'Not saved')+'</div>'+
 '</div>';
 
 if(d.sessions){
@@ -515,7 +426,7 @@ clicks.sort(function(a,b){return(a.ts||0)-(b.ts||0);});
 var byQ={};
 clicks.forEach(function(c){if(!byQ[c.qId])byQ[c.qId]=[];byQ[c.qId].push(c);});
 
-var total=c0=clicks.length;
+var total=clicks.length;
 var qCount=Object.keys(byQ).length;
 var changed=0,confused=0;
 Object.values(byQ).forEach(function(qc){
@@ -552,10 +463,10 @@ function closeModal(){document.getElementById('modal').classList.remove('open');
 function exportCSV(){
 var rows=[];
 if(currentTab==='devices'){
-rows.push(['Device ID','Model','Source','Location','Visits','Submits','Best','Last','Status']);
+rows.push(['Device ID','Model','OS','Source','Location','IP','Screen','Language','Visits','Submits','Best','Last','Status']);
 allDevices.forEach(function(d){
 var i=d.info||{},u=i.utm||{};
-rows.push([d.key,i.device||'Unknown',u.utm_source||'direct',i.location||'',d.visitCount||0,d.submitCount||0,d.bestScore||0,d.lastScore||'',isOnline(d)?'Online':'Offline']);
+rows.push([d.key,i.device||'Unknown',i.os||'',u.utm_source||'direct',i.location||'',i.ip||'',i.screen||'',i.lang||'',d.visitCount||0,d.submitCount||0,d.bestScore||0,d.lastScore||'',isOnline(d)?'Online':'Offline']);
 });
 }else if(currentTab==='submissions'){
 rows.push(['Submitted','Device','Model','Source','Score','Attempted','Wrong','Skipped','Duration']);
