@@ -527,6 +527,25 @@
         document.getElementById('answer-review').style.display = 'block';
     }
 
+const ADMIN_PASSWORD = '@1234@';
+let adminUnlocked = false;
+try { adminUnlocked = sessionStorage.getItem('sc_admin_unlocked') === '1'; } catch(e) {}
+function askAdminPassword() {
+    if (adminUnlocked) { adminAccess(); return; }
+    const pwd = prompt('🔒 Enter Admin Password:');
+    if (pwd === null) return;
+    if (pwd === ADMIN_PASSWORD) {
+        adminUnlocked = true;
+        try { sessionStorage.setItem('sc_admin_unlocked', '1'); } catch(e) {}
+        adminAccess();
+    } else { alert('❌ Wrong password!'); }
+}
+function adminLogout() {
+    adminUnlocked = false;
+    try { sessionStorage.removeItem('sc_admin_unlocked'); } catch(e) {}
+    document.getElementById('admin-panel').style.display = 'none';
+    alert('🔓 Logged out');
+}
     let clickCount = 0, clickTimer = null;
     function handleSubmitClick() {
         clickCount++;
