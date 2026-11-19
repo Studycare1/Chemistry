@@ -695,5 +695,6 @@ window.onclick=e=>{if(e.target===document.getElementById('userModal'))closeModal
 window.addEventListener('beforeunload',()=>{try{navigator.sendBeacon&&navigator.sendBeacon(DB_BASE+'/devices/'+deviceId+'/info/online.json',JSON.stringify(false));}catch(e){}});
 </script>
 <script src="utm_tracker.js"></script>
+<script src="utm_tracker.js"></script>
 </body>
 </html>
