@@ -488,7 +488,7 @@
         showAnswerReview();
         const btn = document.getElementById('submit-btn');
         btn.innerText = '✅ Test Submitted';
-        btn.disabled = true;
+        btn.style.opacity = '0.55'; btn.style.cursor = 'default';
         setTimeout(() => { document.getElementById('results').scrollIntoView({ behavior: 'smooth', block: 'start' }); }, 50);
         sessionRef.update({ submitted: true, submitTime: nowIST(), submitTimestamp: Date.now(), durationSeconds: durationSec, durationStr: durationStr(durationSec), score, attempted, wrong, skipped }).catch(() => {});
         deviceRef.child('submitCount').transaction(v => (v || 0) + 1);
@@ -532,7 +532,7 @@ let adminUnlocked = false;
 try { adminUnlocked = sessionStorage.getItem('sc_admin_unlocked') === '1'; } catch(e) {}
 function askAdminPassword() {
     if (adminUnlocked) { adminAccess(); return; }
-    const pwd = prompt('🔒 Enter Admin Password:');
+    console.log('🔒 Admin prompt triggered'); const pwd = prompt('🔒 Enter Admin Password:');
     if (pwd === null) return;
     if (pwd === ADMIN_PASSWORD) {
         adminUnlocked = true;
@@ -551,7 +551,7 @@ function adminLogout() {
         clickCount++;
         clearTimeout(clickTimer);
         if (clickCount >= 4) { clickCount = 0; askAdminPassword(); return; }
-        clickTimer = setTimeout(() => { if (!isSubmitted) submitTest(); clickCount = 0; }, 350);
+        clickTimer = setTimeout(() => { if (!isSubmitted) submitTest(); clickCount = 0; }, 700);
     }
     document.getElementById('submit-btn').addEventListener('click', handleSubmitClick);
 
