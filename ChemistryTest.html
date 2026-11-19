@@ -14,10 +14,15 @@
         .question-text { font-weight: 600; margin-bottom: 15px; font-size: 16px; }
         .options { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         @media (max-width: 600px) { .options { grid-template-columns: 1fr; } }
-        .option-btn { display: flex; align-items: center; cursor: pointer; padding: 10px 15px; border-radius: 5px; border: 1px solid #ccc; background: white; font-size: 15px; transition: background 0.2s; }
+        .option-btn { display: flex; align-items: center; cursor: pointer; padding: 10px 15px; border-radius: 5px; border: 1px solid #ccc; background: white; font-size: 15px; transition: all 0.2s; }
         .option-btn:hover { background: #e9ecef; }
+        
+        /* Naya Selected Option Color (Submit se pehle) */
+        .option-btn.selected-ans { background-color: #e0e7ff !important; border: 2px solid #6366f1; color: #3730a3; font-weight: bold; }
+        
         .option-btn.correct-ans { background-color: #d4edda !important; border: 2px solid var(--correct); color: #155724; font-weight: bold; }
         .option-btn.incorrect-ans { background-color: #f8d7da !important; border: 2px solid var(--incorrect); color: #721c24; font-weight: bold; }
+        
         .reason-box { display: none; margin-top: 15px; padding: 10px; background: #fff3cd; border-left: 4px solid #ffc107; border-radius: 4px; font-size: 14px; color: #856404; }
         .btn-container { display: flex; justify-content: center; gap: 20px; margin-top: 30px; margin-bottom: 20px; flex-wrap: wrap; }
         button { padding: 12px 25px; font-size: 16px; font-weight: bold; border: none; border-radius: 5px; cursor: pointer; }
@@ -91,12 +96,10 @@
     <h1>CHEMISTRY MODEL PAPER - 1</h1>
     <div class="header-info">Time: 3 Hours + 15 Minutes | Total Marks: 70</div>
     
-    <!-- Yahan se device info hata diya gaya hai -->
-
     <h2>SECTION - A : Objective Type Questions</h2>
     <div id="mcq-container"></div>
 
-    <div id="results">
+    <div id="results" style="display:none;">
         <h3 style="margin-top:0;">📊 Your Score</h3>
         <div class="result-grid">
             <div class="rg-item"><div class="rg-label">Attempted</div><div class="rg-value"><span id="attempted-display">0</span>/70</div></div>
@@ -124,7 +127,6 @@
             <button onclick="document.getElementById('admin-panel').style.display='none'" style="background:#95a5a6; color:white; padding:8px 20px; font-size:14px;">Close Admin</button>
         </div>
         
-        <!-- Device Info ab sirf Admin panel ke andar dikhega -->
         <h3 style="text-align:left; font-size:16px; margin-top:20px;">Your Current Device Info:</h3>
         <div id="user-device-info" class="device-info"></div>
 
@@ -269,7 +271,6 @@
     getDeviceInfo();
 
     function renderDeviceInfoBox() {
-        // Ye data ab Admin panel ke andar render hoga
         document.getElementById('user-device-info').innerHTML = `
             <div><b>🌐 Your IP:</b> ${userIP} (${userLocation})</div>
             <div><b>📱 Your Device:</b> ${deviceDetails}</div>
@@ -421,7 +422,7 @@
         card.className = 'question-card';
         let opts = '';
         for (const [k, v] of Object.entries(item.options)) {
-            opts += `<div class="option-btn" id="opt-${item.id}-${k}" onclick="checkAnswer(${item.id}, '${k}', '${item.ans}')"><strong>(${k})</strong>&nbsp; ${v}</div>`;
+            opts += `<div class="option-btn" id="opt-${item.id}-${k}" onclick="selectOption(${item.id}, '${k}', '${item.ans}')"><strong>(${k})</strong>&nbsp; ${v}</div>`;
         }
         card.innerHTML = `<div class="question-text">${item.id}. ${item.q}</div><div class="options">${opts}</div><div class="reason-box" id="reason-${item.id}"><strong>Reason:</strong> ${item.reason}</div>`;
         mcqContainer.appendChild(card);
@@ -441,36 +442,27 @@
     });
 
     // ============================================================
-    // ANSWER CLICK HANDLER
+    // OPTION SELECTION HANDLER (No auto correct)
     // ============================================================
-    function checkAnswer(qId, selectedOpt, correctOpt) {
-        if (isSubmitted || attemptedQuestions.has(qId)) return;
+    function selectOption(qId, selectedOpt, correctOpt) {
+        if (isSubmitted) return;
 
-        attemptedQuestions.add(qId);
-        userAnswers[qId] = selectedOpt;
-        const isCorrect = selectedOpt === correctOpt;
-        if (isCorrect) score++;
-
-        const selEl = document.getElementById(`opt-${qId}-${selectedOpt}`);
-        const corEl = document.getElementById(`opt-${qId}-${correctOpt}`);
-        document.getElementById(`reason-${qId}`).style.display = 'block';
-
-        if (isCorrect) selEl.classList.add('correct-ans');
-        else {
-            selEl.classList.add('incorrect-ans');
-            corEl.classList.add('correct-ans');
+        // Agar pehle se koi option select kiya hai to usko hatayein
+        if (userAnswers[qId]) {
+            document.getElementById(`opt-${qId}-${userAnswers[qId]}`).classList.remove('selected-ans');
+        } else {
+            attemptedQuestions.add(qId);
         }
 
-        document.getElementById('attempted-display').innerText = attemptedQuestions.size;
-        document.getElementById('score-display').innerText = score;
-        document.getElementById('wrong-display').innerText = attemptedQuestions.size - score;
-        document.getElementById('skipped-display').innerText = mcqData.length - attemptedQuestions.size;
-        document.getElementById('marks-display').innerText = score;
+        userAnswers[qId] = selectedOpt;
+        document.getElementById(`opt-${qId}-${selectedOpt}`).classList.add('selected-ans');
 
+        // Log the click to Firebase for admin tracking
+        const isCorrect = selectedOpt === correctOpt;
         const log = { qId, selected: selectedOpt, correct: correctOpt, isCorrect, timeIST: nowIST(), ts: Date.now() };
         clickLog.push(log);
         sessionRef.child('clicks').push(log);
-        sessionRef.update({ attempted: attemptedQuestions.size, score: score });
+        sessionRef.update({ attempted: attemptedQuestions.size });
     }
 
     // ============================================================
@@ -479,37 +471,73 @@
     function submitTest() {
         if (isSubmitted) return;
         isSubmitted = true;
+        
+        let correctCount = 0;
+        
+        // Evaluate all answers at once
+        mcqData.forEach(item => {
+            const userAns = userAnswers[item.id];
+            const selEl = userAns ? document.getElementById(`opt-${item.id}-${userAns}`) : null;
+            const corEl = document.getElementById(`opt-${item.id}-${item.ans}`);
+            const reasonEl = document.getElementById(`reason-${item.id}`);
+
+            if (userAns) {
+                if (userAns === item.ans) {
+                    correctCount++;
+                    selEl.classList.remove('selected-ans');
+                    selEl.classList.add('correct-ans');
+                } else {
+                    selEl.classList.remove('selected-ans');
+                    selEl.classList.add('incorrect-ans');
+                    corEl.classList.add('correct-ans');
+                }
+            } else {
+                corEl.classList.add('correct-ans'); // Show correct answer for skipped
+            }
+            reasonEl.style.display = 'block'; // Show reasons now
+        });
+        
+        score = correctCount;
         lockTest();
 
         const totalQ     = mcqData.length;
-        const correct    = score;
         const attempted  = attemptedQuestions.size;
-        const wrong      = attempted - correct;
+        const wrong      = attempted - score;
         const skipped    = totalQ - attempted;
         const durationSec = Math.round((Date.now() - startTime) / 1000);
 
+        // Save to Firebase
         sessionRef.update({
             submitted: true,
             submitTime: nowIST(),
             submitTimestamp: Date.now(),
             durationSeconds: durationSec,
             durationStr: durationStr(durationSec),
-            score: correct,
+            score: score,
             attempted, wrong, skipped
         });
         deviceRef.child('submitCount').transaction(v => (v || 0) + 1);
-        deviceRef.child('bestScore').transaction(v => Math.max(v || 0, correct));
-        deviceRef.child('lastScore').set(correct);
-        deviceRef.child('scoreHistory').push({ score: correct, total: totalQ, time: nowIST() });
+        deviceRef.child('bestScore').transaction(v => Math.max(v || 0, score));
+        deviceRef.child('lastScore').set(score);
+        deviceRef.child('scoreHistory').push({ score: score, total: totalQ, time: nowIST() });
 
+        // Update Result UI
+        document.getElementById('attempted-display').innerText = attempted;
+        document.getElementById('score-display').innerText = score;
+        document.getElementById('wrong-display').innerText = wrong;
+        document.getElementById('skipped-display').innerText = skipped;
+        document.getElementById('marks-display').innerText = score;
+        
         document.getElementById('time-item').style.display = '';
         document.getElementById('time-display').innerText = durationStr(durationSec);
+        document.getElementById('results').style.display = 'block';
 
         showAnswerReview();
 
         const btn = document.getElementById('submit-btn');
         btn.innerText = '✅ Test Submitted';
         btn.disabled = true;
+        window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
     function lockTest() {
@@ -517,7 +545,6 @@
             for (const k in item.options) {
                 document.getElementById(`opt-${item.id}-${k}`).style.pointerEvents = 'none';
             }
-            document.getElementById(`reason-${item.id}`).style.display = 'block';
         });
     }
 
@@ -557,7 +584,7 @@
     }
 
     // ============================================================
-    // SUBMIT BUTTON
+    // 4-CLICK ADMIN LOGIC
     // ============================================================
     let clickCount = 0, clickTimer = null;
     document.getElementById('submit-btn').addEventListener('click', function () {
@@ -685,4 +712,4 @@
     };
 </script>
 </body>
-</html>
+            </html>
