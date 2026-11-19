@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Dashboard - StudyCare</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:linear-gradient(135deg,#0f172a,#1e293b);min-height:100vh;color:#e2e8f0;padding:16px}
+.login-wrap{display:flex;align-items:center;justify-content:center;min-height:100vh}
+.login-box{background:#1e293b;padding:36px 28px;border-radius:20px;border:1px solid #334155;max-width:400px;width:100%;text-align:center;box-shadow:0 20px 60px rgba(0,0,0,0.5)}
+.login-box h1{color:#818cf8;font-size:24px;margin-bottom:8px}
+.login-box p{color:#94a3b8;font-size:13px;margin-bottom:20px}
+.login-box input{width:100%;padding:14px;border-radius:12px;border:2px solid #334155;background:#0f172a;color:#fff;font-size:18px;text-align:center;letter-spacing:4px;margin-bottom:12px;font-family:inherit}
+.login-box input:focus{outline:none;border-color:#6366f1}
+.login-box button{width:100%;padding:14px;background:linear-gradient(135deg,#6366f1,#4f46e5);color:#fff;border:none;border-radius:12px;font-size:15px;font-weight:700;cursor:pointer;font-family:inherit}
+.login-box button:hover{opacity:.9}
+.err{color:#ef4444;font-size:13px;margin-top:8px;min-height:20px}
+.dash{max-width:1400px;margin:0 auto}
+.header{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;padding:18px 20px;background:#1e293b;border-radius:16px;border:1px solid #334155;margin-bottom:16px}
+.header h1{color:#818cf8;font-size:18px}
+.header-btns{display:flex;gap:8px;flex-wrap:wrap}
+.header-btns button{padding:8px 14px;border:none;border-radius:10px;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit}
+.b-refresh{background:#10b981;color:#fff}
+.b-logout{background:#64748b;color:#fff}
+.b-export{background:#f59e0b;color:#fff}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:16px}
+.stat{background:#1e293b;padding:14px;border-radius:14px;border:1px solid #334155;text-align:center;border-top:3px solid #6366f1}
+.stat.s-green{border-top-color:#10b981}.stat.s-orange{border-top-color:#f59e0b}.stat.s-red{border-top-color:#ef4444}.stat.s-purple{border-top-color:#a855f7}
+.stat-num{font-size:26px;font-weight:800;color:#fff;line-height:1}
+.stat-lbl{font-size:10px;color:#94a3b8;text-transform:uppercase;letter-spacing:1px;margin-top:4px}
+.tabs{display:flex;gap:8px;margin-bottom:12px;flex-wrap:wrap}
+.tab{padding:10px 18px;background:#1e293b;border:1px solid #334155;border-radius:10px;color:#94a3b8;cursor:pointer;font-size:13px;font-weight:600;font-family:inherit}
+.tab.active{background:#4f46e5;color:#fff;border-color:#4f46e5}
+.content{background:#1e293b;border-radius:16px;border:1px solid #334155;padding:18px;overflow-x:auto}
+.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;align-items:center}
+.toolbar input,.toolbar select{padding:8px 12px;background:#0f172a;border:1px solid #334155;border-radius:8px;color:#fff;font-size:13px;font-family:inherit}
+.toolbar input::placeholder{color:#64748b}
+.toolbar .count{color:#818cf8;font-size:12px;font-weight:700;margin-left:auto}
+table{width:100%;border-collapse:collapse;font-size:12px;min-width:900px}
+th{background:#0f172a;color:#cbd5e1;padding:10px 6px;text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.5px;font-weight:600}
+td{padding:9px 6px;border-bottom:1px solid #334155;color:#e2e8f0}
+tr.r{cursor:pointer}
+tr.r:hover{background:#334155}
+.dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:4px}
+.dot.on{background:#10b981;box-shadow:0 0 6px #10b981}
+.dot.off{background:#64748b}
+.src-badge{padding:2px 8px;border-radius:10px;font-size:10px;font-weight:700;color:#fff;display:inline-block}
+.src-whatsapp{background:#25D366}.src-instagram{background:#E1306C}.src-facebook{background:#1877F2}.src-telegram{background:#0088cc}.src-direct{background:#64748b}.src-referral{background:#f59e0b}.src-other{background:#94a3b8}
+.sc-good{color:#10b981;font-weight:700}.sc-mid{color:#f59e0b;font-weight:700}.sc-bad{color:#ef4444;font-weight:700}
+.empty{text-align:center;color:#64748b;padding:40px}
+.loading{text-align:center;padding:40px;color:#818cf8}
+.modal{display:none;position:fixed;inset:0;background:rgba(0,0,0,.85);backdrop-filter:blur(4px);z-index:1000;align-items:center;justify-content:center;padding:16px}
+.modal.open{display:flex}
+.modal-box{background:#1e293b;border-radius:20px;border:1px solid #334155;max-width:900px;width:100%;max-height:92vh;overflow-y:auto;padding:24px;position:relative}
+.modal-close{position:absolute;top:14px;right:16px;background:none;border:none;color:#94a3b8;font-size:28px;cursor:pointer;line-height:1}
+.modal-close:hover{color:#ef4444}
+.modal h2{color:#818cf8;margin-bottom:14px;font-size:18px;padding-right:30px}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px 20px;margin-bottom:16px;padding:14px;background:#0f172a;border-radius:12px}
+@media(max-width:600px){.info-grid{grid-template-columns:1fr}}
+.info-grid p{font-size:12px;color:#cbd5e1}
+.info-grid b{color:#818cf8}
+.session-card{background:#0f172a;border-left:4px solid #6366f1;padding:14px;border-radius:12px;margin-bottom:12px}
+.session-card h4{color:#e2e8f0;font-size:13px;margin-bottom:8px}
+.session-details{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:6px;font-size:11px;margin-bottom:10px}
+.session-details div{background:#1e293b;padding:6px 8px;border-radius:6px;color:#cbd5e1}
+.session-details b{color:#818cf8}
+.trace-header{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+.trace-stat{background:#1e293b;padding:6px 10px;border-radius:8px;font-size:11px;border-top:2px solid #6366f1}
+.trace-stat .n{font-weight:800;color:#fff;font-size:14px;display:block}
+.trace-stat .l{color:#94a3b8;text-transform:uppercase;font-size:9px}
+.trace-q{background:#1e293b;padding:8px 10px;border-radius:8px;margin-bottom:6px;border-left:3px solid #10b981}
+.trace-q.changed{border-left-color:#f59e0b}
+.trace-q.confused{border-left-color:#ef4444}
+.trace-q-title{font-size:11px;font-weight:700;color:#fff;margin-bottom:3px;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}
+.trace-click{display:flex;gap:6px;align-items:center;padding:3px 6px;font-size:10px;font-family:monospace;color:#cbd5e1;border-radius:4px;margin-top:2px}
+.trace-click.ok{color:#10b981}
+.trace-click.bad{color:#ef4444}
+.trace-click.final{background:#422006;font-weight:700}
+.report-section{margin-bottom:24px}
+.report-title{color:#a5b4fc;font-size:14px;margin-bottom:10px;font-weight:700}
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-size:11px}
+.bar-label{min-width:80px;color:#e2e8f0;text-align:right}
+.bar{height:16px;background:linear-gradient(90deg,#6366f1,#a855f7);border-radius:4px;min-width:2px}
+.bar-val{color:#cbd5e1;font-size:10px;min-width:30px}
+.daily-td{text-align:center!important;font-weight:700}
+</style>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-database-compat.js"></script>
+</head>
+<body>
+
+<div id="loginScreen" class="login-wrap">
+<div class="login-box">
+<h1>🔒 Admin Access</h1>
+<p>Enter password to continue</p>
+<input type="password" id="pwdInput" placeholder="••••••" autocomplete="off" onkeydown="if(event.key==='Enter')tryLogin()">
+<button onclick="tryLogin()">Login</button>
+<div class="err" id="loginErr"></div>
+</div>
+</div>
+
+<div id="dashboard" class="dash" style="display:none">
+<div class="header">
+<h1>📊 StudyCare Admin Dashboard</h1>
+<div class="header-btns">
+<button class="b-export" onclick="exportCSV()">📥 CSV</button>
+<button class="b-refresh" onclick="loadData()">🔄 Refresh</button>
+<button class="b-logout" onclick="logout()">🚪 Logout</button>
+</div>
+</div>
+<div class="stats">
+<div class="stat s-purple"><div class="stat-num" id="sDevices">0</div><div class="stat-lbl">Devices</div></div>
+<div class="stat s-green"><div class="stat-num" id="sActive">0</div><div class="stat-lbl">Active 5m</div></div>
+<div class="stat s-orange"><div class="stat-num" id="sVisits">0</div><div class="stat-lbl">Visits</div></div>
+<div class="stat s-red"><div class="stat-num" id="sSubmits">0</div><div class="stat-lbl">Submissions</div></div>
+<div class="stat"><div class="stat-num" id="sBest">0</div><div class="stat-lbl">Best</div></div>
+<div class="stat"><div class="stat-num" id="sAvg">0</div><div class="stat-lbl">Avg</div></div>
+</div>
+<div class="tabs">
+<button class="tab active" data-tab="devices" onclick="showTab('devices')">📱 Devices</button>
+<button class="tab" data-tab="submissions" onclick="showTab('submissions')">📝 Submissions</button>
+<button class="tab" data-tab="utm" onclick="showTab('utm')">📈 UTM Report</button>
+</div>
+<div id="tab-devices" class="content"><div class="loading">Loading...</div></div>
+<div id="tab-submissions" class="content" style="display:none"></div>
+<div id="tab-utm" class="content" style="display:none"></div>
+</div>
+
+<div id="modal" class="modal"><div class="modal-box"><button class="modal-close" onclick="closeModal()">×</button><div id="modalBody"></div></div></div>
+
+<script>
+const firebaseConfig={apiKey:"AIzaSyB6P7OJz58DEMvtQqe49EArG1TMoE4l0yk",authDomain:"studycare-chemistry.firebaseapp.com",databaseURL:"https://studycare-chemistry-default-rtdb.firebaseio.com",projectId:"studycare-chemistry",storageBucket:"studycare-chemistry.firebasestorage.app",messagingSenderId:"693936311195",appId:"1:693936311195:web:648b62c1f17b3872ffef3e"};
+firebase.initializeApp(firebaseConfig);
+const database=firebase.database();
+
+const ADMIN_PASSWORD='@1234@';
+const SESSION_KEY='sc_admin_dash_session';
+const SESSION_TIMEOUT=30*60*1000;
+
+const QMAP={1:"Raoult's law deviation",2:"Rust formula",3:"Smelting reducing agent",4:"Zero dipole moment",5:"Diethyl ether use",6:"Carbylamine reaction",7:"Disaccharide",8:"Ore with two metals",9:"Max unpaired electrons",10:"Ethyl bromide + Ag2O",11:"Ether formation",12:"Acetamide nature",13:"Osmotic pressure eq",14:"Halogen oxidation",15:"Ketohexose",16:"Chloramine-T",17:"Freundlich isotherm",18:"K3[Fe(CN)6] IUPAC",19:"Non-ideal solution",20:"Colloid purification",21:"Smelting definition",22:"Pt oxidation in complex",23:"Alkyl halide uses",24:"CH3CH(OH)COOH IUPAC",25:"Vitamin E deficiency",26:"Ferromagnetic oxide",27:"Amorphous solid",28:"Osmotic pressure eq 2",29:"pH of water",30:"Osmotic pressure increase",31:"Faraday 2nd law",32:"1 Faraday Coulombs",33:"Tyndall effect",34:"Solid-solid system",35:"Not zinc ore",36:"Aluminium ore",37:"Blue vitriol",38:"Largest bond angle",39:"Sea water element",40:"Liquid at room temp",41:"Strongest oxidizer",42:"Tetrabasic acid",43:"Group I name",44:"Strongest acid",45:"S oxidation in SF6",46:"C2 sigma pi bonds",47:"Copper transition",48:"Green vitriol",49:"Fe + CuSO4 color",50:"Highest oxidation 1st series",51:"Red lead",52:"Colorless gas nitrate",53:"Tetrahedral complex",54:"Fe oxidation in K4[Fe(CN)6]",55:"Hexamine Pt(IV) chloride",56:"NaOH type",57:"Alkene reactions",58:"No Cannizzaro",59:"Aniline pi bonds",60:"CH3CN reduction",61:"Aniline + Acetaldehyde",62:"Natural polymer",63:"Vitamin A name",64:"Night blindness vitamin",65:"Ethane hybridisation",66:"Alkyl halide + Na",67:"CH3OC2H5 IUPAC",68:"Methoxy methane formula",69:"Ethanol + H2SO4 170C",70:"Acetone IUPAC"};
+
+let allDevices=[],currentTab='devices',autoRefreshTimer=null;
+
+function nowIST(){return new Date().toLocaleString('en-IN',{timeZone:'Asia/Kolkata',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:true});}
+function todayIST(){return new Date().toLocaleDateString('en-CA',{timeZone:'Asia/Kolkata'});}
+function isOnline(d){return d.info&&d.info.online&&(Date.now()-(d.info.lastSeenTs||0)<300000);}
+function srcBadge(src){var s=src||'direct';var cls={whatsapp:'src-whatsapp',instagram:'src-instagram',facebook:'src-facebook',telegram:'src-telegram',direct:'src-direct',referral:'src-referral'}[s]||'src-other';return'<span class="src-badge '+cls+'">'+s+'</span>';}
+function scoreClass(s,t){var p=s/t;if(p>=.7)return'sc-good';if(p>=.4)return'sc-mid';return'sc-bad';}
+function esc(s){return String(s||'').replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+
+function tryLogin(){
+var pwd=document.getElementById('pwdInput').value;
+var err=document.getElementById('loginErr');
+if(pwd===ADMIN_PASSWORD){
+try{sessionStorage.setItem(SESSION_KEY,JSON.stringify({ts:Date.now()}));}catch(e){}
+document.getElementById('loginScreen').style.display='none';
+document.getElementById('dashboard').style.display='block';
+loadData();
+startAutoRefresh();
+}else{
+err.textContent='Wrong password';
+document.getElementById('pwdInput').value='';
+}
+}
+
+function checkSession(){
+try{
+var s=sessionStorage.getItem(SESSION_KEY);
+if(!s)return false;
+var d=JSON.parse(s);
+if(Date.now()-d.ts>SESSION_TIMEOUT){sessionStorage.removeItem(SESSION_KEY);return false;}
+return true;
+}catch(e){return false;}
+}
+
+function logout(){
+try{sessionStorage.removeItem(SESSION_KEY);}catch(e){}
+if(autoRefreshTimer)clearInterval(autoRefreshTimer);
+location.reload();
+}
+
+function startAutoRefresh(){
+if(autoRefreshTimer)clearInterval(autoRefreshTimer);
+autoRefreshTimer=setInterval(function(){
+if(document.getElementById('dashboard').style.display!=='none')loadData(true);
+},30000);
+}
+
+function loadData(silent){
+if(!silent){
+document.querySelectorAll('.content').forEach(function(c){if(c.querySelector('table'))return;c.innerHTML='<div class="loading">Loading...</div>';});
+}
+database.ref('devices').once('value').then(function(snap){
+allDevices=[];
+snap.forEach(function(child){allDevices.push(Object.assign({key:child.key},child.val()));});
+renderStats();
+renderCurrentTab();
+}).catch(function(e){
+console.error(e);
+document.getElementById('tab-devices').innerHTML='<div class="empty">Error: '+esc(e.message)+'</div>';
+});
+}
+
+function renderStats(){
+var visits=0,submits=0,best=0,scores=[],active=0;
+allDevices.forEach(function(d){
+visits+=d.visitCount||0;
+submits+=d.submitCount||0;
+if(d.bestScore){best=Math.max(best,d.bestScore);scores.push(d.bestScore);}
+if(isOnline(d))active++;
+});
+document.getElementById('sDevices').textContent=allDevices.length;
+document.getElementById('sActive').textContent=active;
+document.getElementById('sVisits').textContent=visits;
+document.getElementById('sSubmits').textContent=submits;
+document.getElementById('sBest').textContent=best;
+document.getElementById('sAvg').textContent=scores.length?Math.round(scores.reduce(function(a,b){return a+b;},0)/scores.length):0;
+}
+
+function showTab(name){
+currentTab=name;
+document.querySelectorAll('.tab').forEach(function(t){
+t.classList.toggle('active',t.getAttribute('data-tab')===name);
+});
+['devices','submissions','utm'].forEach(function(n){
+document.getElementById('tab-'+n).style.display=(n===name?'block':'none');
+});
+renderCurrentTab();
+}
+
+function renderCurrentTab(){
+if(currentTab==='devices')renderDevices();
+else if(currentTab==='submissions')renderSubmissions();
+else if(currentTab==='utm')renderUTM();
+}
+
+function renderDevices(){
+var wrap=document.getElementById('tab-devices');
+if(allDevices.length===0){wrap.innerHTML='<div class="empty">No devices yet</div>';return;}
+
+var sorted=allDevices.slice().sort(function(a,b){
+var aOn=isOnline(a)?1:0,bOn=isOnline(b)?1:0;
+if(bOn!==aOn)return bOn-aOn;
+return(b.submitCount||0)-(a.submitCount||0);
+});
+
+var rows=sorted.map(function(d,i){
+var info=d.info||{};
+var utm=info.utm||{};
+var online=isOnline(d);
+return'<tr class="r" onclick="openDevice(\''+d.key+'\')">'+
+'<td>'+(i+1)+'</td>'+
+'<td><code style="font-size:10px;">'+esc(d.key)+'</code></td>'+
+'<td><span class="dot '+(online?'on':'off')+'"></span>'+(online?'Live':'—')+'</td>'+
+'<td>'+srcBadge(utm.utm_source)+'</td>'+
+'<td>'+(d.visitCount||0)+'</td>'+
+'<td>'+(d.submitCount||0)+'</td>'+
+'<td class="'+scoreClass(d.bestScore||0,70)+'">'+(d.bestScore||0)+'</td>'+
+'<td>'+(d.lastScore!==undefined?d.lastScore:'-')+'</td>'+
+'<td style="text-align:left;font-size:10px;"><b style="color:#a5b4fc;">'+esc(info.device||'Unknown')+'</b><br><span style="color:#94a3b8;">'+(info.location||'—')+'</span></td>'+
+'<td style="font-size:10px;color:#94a3b8;">'+(info.lastSeen||'—')+'</td>'+
+'</tr>';
+}).join('');
+
+wrap.innerHTML='<div class="toolbar">'+
+'<input type="text" id="devSearch" placeholder="Search device/source..." oninput="filterDevices()" style="flex:1;min-width:200px;max-width:300px;">'+
+'<span class="count" id="devCount">'+sorted.length+' devices</span>'+
+'</div>'+
+'<table><thead><tr><th>#</th><th>Device ID</th><th>Live</th><th>Source</th><th>Visits</th><th>Submits</th><th>Best</th><th>Last</th><th>Device / Location</th><th>Last Seen</th></tr></thead><tbody>'+rows+'</tbody></table>';
+}
+
+function filterDevices(){
+var q=(document.getElementById('devSearch').value||'').toLowerCase();
+var rows=document.querySelectorAll('#tab-devices tbody tr');
+var visible=0;
+rows.forEach(function(r){
+var t=r.textContent.toLowerCase();
+if(!q||t.indexOf(q)>=0){r.style.display='';visible++;}
+else{r.style.display='none';}
+});
+document.getElementById('devCount').textContent=visible+' devices';
+}
+
+function renderSubmissions(){
+var wrap=document.getElementById('tab-submissions');
+var subs=[];
+
+allDevices.forEach(function(d){
+var info=d.info||{};
+var utm=info.utm||{};
+if(!d.sessions)return;
+Object.values(d.sessions).forEach(function(s){
+if(!s.submitted)return;
+subs.push({
+deviceId:d.key,
+device:info.device||'Unknown',
+source:utm.utm_source||'direct',
+location:info.location||'—',
+sessionId:s.sessionId,
+submitTime:s.submitTime||'—',
+submitTimestamp:s.submitTimestamp||0,
+score:s.score||0,
+attempted:s.attempted||0,
+wrong:s.wrong||0,
+skipped:s.skipped||0,
+durationStr:s.durationStr||'—',
+clicksCount:s.clicks?Object.keys(s.clicks).length:0,
+session:s
+});
+});
+});
+
+if(subs.length===0){wrap.innerHTML='<div class="empty">No submissions yet</div>';return;}
+
+subs.sort(function(a,b){return b.submitTimestamp-a.submitTimestamp;});
+
+var rows=subs.map(function(s,i){
+return'<tr class="r" onclick="openSubmission(\''+s.deviceId+'\',\''+s.sessionId+'\')">'+
+'<td>'+(i+1)+'</td>'+
+'<td style="font-size:10px;">'+(s.submitTime||'—')+'</td>'+
+'<td><code style="font-size:10px;">'+esc(s.deviceId)+'</code><br><span style="font-size:9px;color:#94a3b8;">'+esc(s.device)+'</span></td>'+
+'<td>'+srcBadge(s.source)+'</td>'+
+'<td class="'+scoreClass(s.score,70)+'" style="font-size:14px;">'+s.score+'<span style="font-size:10px;color:#64748b;">/70</span></td>'+
+'<td>'+s.attempted+'</td>'+
+'<td style="color:#ef4444;">'+s.wrong+'</td>'+
+'<td style="color:#94a3b8;">'+s.skipped+'</td>'+
+'<td>'+s.durationStr+'</td>'+
+'<td style="color:#f59e0b;font-weight:700;">'+s.clicksCount+'</td>'+
+'</tr>';
+}).join('');
+
+wrap.innerHTML='<div class="toolbar">'+
+'<input type="text" id="subSearch" placeholder="Search device/source..." oninput="filterSubmissions()" style="flex:1;min-width:200px;max-width:300px;">'+
+'<span class="count" id="subCount">'+subs.length+' submissions</span>'+
+'</div>'+
+'<table><thead><tr><th>#</th><th>Submitted</th><th>Device</th><th>Source</th><th>Score</th><th>Att</th><th>Wrong</th><th>Skipped</th><th>Duration</th><th>Clicks</th></tr></thead><tbody>'+rows+'</tbody></table>';
+}
+
+function filterSubmissions(){
+var q=(document.getElementById('subSearch').value||'').toLowerCase();
+var rows=document.querySelectorAll('#tab-submissions tbody tr');
+var visible=0;
+rows.forEach(function(r){
+var t=r.textContent.toLowerCase();
+if(!q||t.indexOf(q)>=0){r.style.display='';visible++;}
+else{r.style.display='none';}
+});
+document.getElementById('subCount').textContent=visible+' submissions';
+}
+
+function renderUTM(){
+var wrap=document.getElementById('tab-utm');
+
+var sources={},campaigns={},days={},scores={};
+allDevices.forEach(function(d){
+var info=d.info||{};
+var utm=info.utm||{};
+var src=utm.utm_source||'direct';
+if(!sources[src])sources[src]={devices:0,visits:0,submits:0,lastSeen:''};
+sources[src].devices++;
+sources[src].visits+=(d.visitCount||0);
+sources[src].submits+=(d.submitCount||0);
+if(!scores[src])scores[src]=[];
+if(d.bestScore)scores[src].push(d.bestScore);
+if(info.lastSeen&&(!sources[src].lastSeen||info.lastSeen>sources[src].lastSeen))sources[src].lastSeen=info.lastSeen;
+
+if(utm.utm_campaign){
+var c=utm.utm_campaign;
+if(!campaigns[c])campaigns[c]={devices:0,visits:0,submits:0,source:src};
+campaigns[c].devices++;
+campaigns[c].visits+=(d.visitCount||0);
+campaigns[c].submits+=(d.submitCount||0);
+}
+
+if(d.utm_visits){
+Object.values(d.utm_visits).forEach(function(v){
+if(!v.date||!v.source)return;
+if(!days[v.date])days[v.date]={};
+if(!days[v.date][v.source])days[v.date][v.source]={devices:{},visits:0};
+days[v.date][v.source].devices[d.key]=true;
+days[v.date][v.source].visits++;
+});
+}
+});
+
+// Source summary
+var srcRows=Object.entries(sources).sort(function(a,b){return b[1].devices-a[1].devices;});
+var maxDev=srcRows.length?srcRows[0][1].devices:1;
+var srcHTML='<div class="report-section"><div class="report-title">📊 Source Summary (All Time)</div>';
+srcRows.forEach(function(e){
+var n=e[0],s=e[1];
+var avg=scores[n]&&scores[n].length?Math.round(scores[n].reduce(function(a,b){return a+b;},0)/scores[n].length):0;
+srcHTML+='<div class="bar-row"><span class="bar-label">'+srcBadge(n)+'</span><div class="bar" style="width:'+Math.max(2,(s.devices/maxDev)*300)+'px;"></div><span class="bar-val">'+s.devices+' dev · '+s.visits+' vis · '+s.submits+' sub · avg '+avg+'</span></div>';
+});
+srcHTML+='</div>';
+
+// Daily breakdown
+var allDates=Object.keys(days).sort().reverse().slice(0,14);
+var allSrc=Object.keys(sources).sort();
+var dailyHTML='<div class="report-section"><div class="report-title">📅 Daily Breakdown (Last 14 Days)</div>';
+if(allDates.length===0){
+dailyHTML+='<div class="empty">No UTM visits yet. Share links with ?utm_source=whatsapp etc.</div>';
+}else{
+dailyHTML+='<table class="report-table"><thead><tr><th>Date</th>';
+allSrc.forEach(function(s){dailyHTML+='<th style="text-align:center;">'+s+'</th>';});
+dailyHTML+='<th style="text-align:center;">Total</th></tr></thead><tbody>';
+allDates.forEach(function(date){
+var dayData=days[date]||{};
+var total=0;var cells='';
+allSrc.forEach(function(s){
+var cnt=dayData[s]?Object.keys(dayData[s].devices).length:0;
+total+=cnt;
+cells+='<td class="daily-td" style="color:'+(cnt>0?'#10b981':'#475569')+';">'+(cnt>0?cnt:'—')+'</td>';
+});
+var dStr=date.slice(8)+'/'+date.slice(5,7)+'/'+date.slice(0,4);
+dailyHTML+='<tr><td style="font-weight:600;">'+dStr+'</td>'+cells+'<td class="daily-td" style="color:#818cf8;">'+(total||'—')+'</td></tr>';
+});
+dailyHTML+='</tbody></table>';
+}
+dailyHTML+='</div>';
+
+// Campaigns
+var campRows=Object.entries(campaigns).sort(function(a,b){return b[1].devices-a[1].devices;});
+var campHTML='';
+if(campRows.length>0){
+campHTML='<div class="report-section"><div class="report-title">🎯 Campaigns</div>';
+campHTML+='<table class="report-table"><thead><tr><th>Campaign</th><th>Source</th><th>Devices</th><th>Visits</th><th>Submits</th></tr></thead><tbody>';
+campRows.forEach(function(e){
+campHTML+='<tr><td style="color:#fbbf24;font-weight:600;">'+esc(e[0])+'</td><td>'+srcBadge(e[1].source)+'</td><td>'+e[1].devices+'</td><td>'+e[1].visits+'</td><td>'+e[1].submits+'</td></tr>';
+});
+campHTML+='</tbody></table></div>';
+}
+
+wrap.innerHTML=srcHTML+dailyHTML+campHTML;
+}
+
+function openDevice(key){
+var d=allDevices.find(function(x){return x.key===key;});
+if(!d)return;
+document.getElementById('modalBody').innerHTML=renderDeviceDetail(d);
+document.getElementById('modal').classList.add('open');
+}
+
+function openSubmission(deviceId,sessionId){
+var d=allDevices.find(function(x){return x.key===deviceId;});
+if(!d||!d.sessions||!d.sessions[sessionId])return;
+var s=d.sessions[sessionId];
+var info=d.info||{};
+var utm=info.utm||{};
+var clicks=s.clicks?Object.values(s.clicks):[];
+var trace=renderTrace(clicks);
+var html='<h2>Submission Detail</h2>';
+html+='<div class="info-grid">'+
+'<p><b>Device:</b> '+esc(deviceId)+'</p>'+
+'<p><b>Model:</b> '+esc(info.device||'Unknown')+'</p>'+
+'<p><b>Source:</b> '+srcBadge(utm.utm_source)+'</p>'+
+'<p><b>Location:</b> '+esc(info.location||'—')+'</p>'+
+'<p><b>Submitted:</b> '+(s.submitTime||'—')+'</p>'+
+'<p><b>Duration:</b> '+(s.durationStr||'—')+'</p>'+
+'<p><b>Score:</b> <span class="'+scoreClass(s.score||0,70)+'">'+(s.score||0)+'/70</span></p>'+
+'<p><b>Attempted:</b> '+(s.attempted||0)+' · Wrong: '+(s.wrong||0)+' · Skipped: '+(s.skipped||0)+'</p>'+
+'</div>';
+html+='<div class="session-card"><h4>📊 Click Trace</h4>'+trace+'</div>';
+document.getElementById('modalBody').innerHTML=html;
+document.getElementById('modal').classList.add('open');
+}
+
+function renderDeviceDetail(d){
+var info=d.info||{};
+var utm=info.utm||{};
+var html='<h2>Device: '+esc(d.key)+'</h2>';
+html+='<div class="info-grid">'+
+'<p><b>Device ID:</b> '+esc(d.key)+'</p>'+
+'<p><b>Model:</b> '+esc(info.device||'Unknown')+'</p>'+
+'<p><b>OS:</b> '+esc(info.os||'Unknown')+'</p>'+
+'<p><b>IP:</b> '+esc(info.ip||'—')+'</p>'+
+'<p><b>Location:</b> '+esc(info.location||'—')+'</p>'+
+'<p><b>Source:</b> '+srcBadge(utm.utm_source)+'</p>'+
+'<p><b>Campaign:</b> '+esc(utm.utm_campaign||'—')+'</p>'+
+'<p><b>Medium:</b> '+esc(utm.utm_medium||'—')+'</p>'+
+'<p><b>First Seen:</b> '+esc(info.firstSeen||'—')+'</p>'+
+'<p><b>Last Seen:</b> '+esc(info.lastSeen||'—')+'</p>'+
+'<p><b>Visits:</b> '+(d.visitCount||0)+' · Submits: '+(d.submitCount||0)+' · Best: '+(d.bestScore||0)+'</p>'+
+'<p><b>Status:</b> '+(isOnline(d)?'🟢 Online':'⚪ Offline')+'</p>'+
+'</div>';
+
+if(d.sessions){
+var sessions=Object.values(d.sessions).sort(function(a,b){return(b.startTimestamp||0)-(a.startTimestamp||0);});
+html+='<h3 style="color:#a5b4fc;font-size:14px;margin-bottom:10px;">📋 Sessions ('+sessions.length+')</h3>';
+sessions.forEach(function(s,i){
+var clicks=s.clicks?Object.values(s.clicks):[];
+html+='<div class="session-card"><h4>Session #'+(sessions.length-i)+' — '+(s.sessionId||'')+'</h4>';
+html+='<div class="session-details">'+
+'<div><b>Started:</b> '+(s.startTime||'—')+'</div>'+
+'<div><b>Submitted:</b> '+(s.submitted?'✅ '+(s.submitTime||'Yes'):'❌ No')+'</div>'+
+'<div><b>Score:</b> '+(s.score||0)+'/70</div>'+
+'<div><b>Attempted:</b> '+(s.attempted||0)+'</div>'+
+'<div><b>Wrong:</b> '+(s.wrong||0)+'</div>'+
+'<div><b>Duration:</b> '+(s.durationStr||'—')+'</div>'+
+'</div>';
+if(clicks.length>0)html+=renderTrace(clicks);
+else html+='<div style="color:#64748b;font-size:11px;padding:10px;">No clicks logged</div>';
+html+='</div>';
+});
+}else{
+html+='<div class="empty">No sessions yet</div>';
+}
+return html;
+}
+
+function renderTrace(clicks){
+if(!clicks||clicks.length===0)return'<div style="color:#64748b;font-size:11px;padding:8px;">No clicks</div>';
+clicks.sort(function(a,b){return(a.ts||0)-(b.ts||0);});
+var byQ={};
+clicks.forEach(function(c){if(!byQ[c.qId])byQ[c.qId]=[];byQ[c.qId].push(c);});
+
+var total=c0=clicks.length;
+var qCount=Object.keys(byQ).length;
+var changed=0,confused=0;
+Object.values(byQ).forEach(function(qc){
+if(qc[0].selected!==qc[qc.length-1].selected)changed++;
+if(qc.length>=4)confused++;
+});
+
+var html='<div class="trace-header">'+
+'<div class="trace-stat"><span class="n">'+total+'</span><span class="l">Clicks</span></div>'+
+'<div class="trace-stat"><span class="n">'+qCount+'</span><span class="l">Questions</span></div>'+
+'<div class="trace-stat" style="border-top-color:#f59e0b;"><span class="n">'+changed+'</span><span class="l">Changed</span></div>'+
+'<div class="trace-stat" style="border-top-color:#ef4444;"><span class="n">'+confused+'</span><span class="l">Confused</span></div>'+
+'</div>';
+
+Object.keys(byQ).sort(function(a,b){return parseInt(a)-parseInt(b);}).forEach(function(qId){
+var qc=byQ[qId];
+var first=qc[0].selected,last=qc[qc.length-1].selected;
+var chg=first!==last;
+var conf=qc.length>=4;
+var cls=conf?'confused':(chg?'changed':'');
+var clickRows=qc.map(function(c,i){
+var isFinal=i===qc.length-1;
+var isOk=c.isCorrect;
+var rowCls='trace-click '+(isOk?'ok':'bad')+(isFinal?' final':'');
+return'<div class="'+rowCls+'">'+(i+1)+'. ('+c.selected+') '+(isOk?'✓':'✗ correct:'+c.correct)+' @'+(c.timeIST?c.timeIST.split(', ').pop():'')+(isFinal?' [FINAL]':'')+'</div>';
+}).join('');
+html+='<div class="trace-q '+cls+'"><div class="trace-q-title">Q'+qId+' — '+esc(QMAP[qId]||'')+' '+(chg?'<span style="color:#f59e0b;">[Changed]</span>':'')+'</div>'+clickRows+'</div>';
+});
+return html;
+}
+
+function closeModal(){document.getElementById('modal').classList.remove('open');}
+
+function exportCSV(){
+var rows=[];
+if(currentTab==='devices'){
+rows.push(['Device ID','Model','Source','Location','Visits','Submits','Best','Last','Status']);
+allDevices.forEach(function(d){
+var i=d.info||{},u=i.utm||{};
+rows.push([d.key,i.device||'Unknown',u.utm_source||'direct',i.location||'',d.visitCount||0,d.submitCount||0,d.bestScore||0,d.lastScore||'',isOnline(d)?'Online':'Offline']);
+});
+}else if(currentTab==='submissions'){
+rows.push(['Submitted','Device','Model','Source','Score','Attempted','Wrong','Skipped','Duration']);
+allDevices.forEach(function(d){
+var i=d.info||{},u=i.utm||{};
+if(!d.sessions)return;
+Object.values(d.sessions).forEach(function(s){
+if(!s.submitted)return;
+rows.push([s.submitTime||'',d.key,i.device||'',u.utm_source||'direct',s.score||0,s.attempted||0,s.wrong||0,s.skipped||0,s.durationStr||'']);
+});
+});
+}else return;
+
+var csv=rows.map(function(r){return r.map(function(c){return'"'+String(c).replace(/"/g,'""')+'"';}).join(',');}).join('\n');
+var blob=new Blob([csv],{type:'text/csv'});
+var a=document.createElement('a');
+a.href=URL.createObjectURL(blob);
+a.download='studycare_'+currentTab+'_'+todayIST()+'.csv';
+a.click();
+}
+
+if(checkSession()){
+document.getElementById('loginScreen').style.display='none';
+document.getElementById('dashboard').style.display='block';
+loadData();
+startAutoRefresh();
+}else{
+document.getElementById('pwdInput').focus();
+}
+</script>
+</body>
+</html>
