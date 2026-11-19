@@ -79,7 +79,7 @@
         #section-b { margin-top: 40px; border-top: 2px dashed #ccc; padding-top: 20px; }
         .ans-card { background: #fdfdfd; border-left: 5px solid var(--secondary); padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
         .ans-text { color: #444; margin-top: 10px; white-space: pre-wrap; font-size: 15px; }
-        .device-info { font-size: 12px; color: #333; margin-top: 10px; background: #e8f4f8; padding: 12px; border-radius: 5px; border: 1px solid #bce8f1; display: grid; grid-template-columns: 1fr 1fr; gap: 6px 15px; }
+        .device-info { font-size: 13px; color: #333; margin-top: 10px; background: #e8f4f8; padding: 15px; border-radius: 5px; border: 1px solid #bce8f1; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
         @media (max-width: 600px) { .device-info { grid-template-columns: 1fr; } }
         .device-info b { color: var(--primary); }
     </style>
@@ -90,7 +90,8 @@
 <div class="container">
     <h1>CHEMISTRY MODEL PAPER - 1</h1>
     <div class="header-info">Time: 3 Hours + 15 Minutes | Total Marks: 70</div>
-    <div id="user-device-info" class="device-info"></div>
+    
+    <!-- Yahan se device info hata diya gaya hai -->
 
     <h2>SECTION - A : Objective Type Questions</h2>
     <div id="mcq-container"></div>
@@ -122,6 +123,11 @@
         <div style="text-align:center;">
             <button onclick="document.getElementById('admin-panel').style.display='none'" style="background:#95a5a6; color:white; padding:8px 20px; font-size:14px;">Close Admin</button>
         </div>
+        
+        <!-- Device Info ab sirf Admin panel ke andar dikhega -->
+        <h3 style="text-align:left; font-size:16px; margin-top:20px;">Your Current Device Info:</h3>
+        <div id="user-device-info" class="device-info"></div>
+
         <div class="admin-stats">
             <div class="admin-stat"><div class="num" id="adm-devices">0</div><div class="lbl">Total Devices</div></div>
             <div class="admin-stat"><div class="num" id="adm-visits">0</div><div class="lbl">Total Visits</div></div>
@@ -185,7 +191,7 @@
     }
 
     // ============================================================
-    // DEVICE ID — stable fingerprint (same mobile/browser = same ID)
+    // DEVICE ID
     // ============================================================
     function getDeviceId() {
         let id = localStorage.getItem('sc_device_id');
@@ -217,8 +223,8 @@
     let isSubmitted = false;
     let score = 0;
     const attemptedQuestions = new Set();
-    const userAnswers = {};       // qId → selected option
-    const clickLog = [];          // local click history
+    const userAnswers = {};       
+    const clickLog = [];          
     let userIP = "Fetching...";
     let userLocation = "Unknown";
     let deviceDetails = "Detecting...";
@@ -263,11 +269,12 @@
     getDeviceInfo();
 
     function renderDeviceInfoBox() {
+        // Ye data ab Admin panel ke andar render hoga
         document.getElementById('user-device-info').innerHTML = `
-            <div><b>🌐 IP:</b> ${userIP} (${userLocation})</div>
-            <div><b>📱 Device:</b> ${deviceDetails}</div>
-            <div><b>🆔 Device ID:</b> ${deviceId}</div>
-            <div><b>🕐 IST Time:</b> ${nowIST()}</div>
+            <div><b>🌐 Your IP:</b> ${userIP} (${userLocation})</div>
+            <div><b>📱 Your Device:</b> ${deviceDetails}</div>
+            <div><b>🆔 Your Device ID:</b> ${deviceId}</div>
+            <div><b>🕐 Current IST Time:</b> ${nowIST()}</div>
         `;
     }
 
@@ -284,7 +291,7 @@
     }
 
     // ============================================================
-    // VISIT + SESSION TRACKING (on every page load)
+    // VISIT + SESSION TRACKING
     // ============================================================
     deviceRef.child('visitCount').transaction(v => (v || 0) + 1);
     deviceRef.child('info/firstSeen').transaction(v => v || nowIST());
@@ -296,7 +303,6 @@
         score: 0,
         attempted: 0
     });
-    renderDeviceInfoBox();
 
     // ============================================================
     // 70 MCQs
@@ -455,14 +461,12 @@
             corEl.classList.add('correct-ans');
         }
 
-        // Update result grid live
         document.getElementById('attempted-display').innerText = attemptedQuestions.size;
         document.getElementById('score-display').innerText = score;
         document.getElementById('wrong-display').innerText = attemptedQuestions.size - score;
         document.getElementById('skipped-display').innerText = mcqData.length - attemptedQuestions.size;
         document.getElementById('marks-display').innerText = score;
 
-        // Log click locally + Firebase (IST time)
         const log = { qId, selected: selectedOpt, correct: correctOpt, isCorrect, timeIST: nowIST(), ts: Date.now() };
         clickLog.push(log);
         sessionRef.child('clicks').push(log);
@@ -470,7 +474,7 @@
     }
 
     // ============================================================
-    // SUBMIT — show answer sheet + save everything
+    // SUBMIT
     // ============================================================
     function submitTest() {
         if (isSubmitted) return;
@@ -484,7 +488,6 @@
         const skipped    = totalQ - attempted;
         const durationSec = Math.round((Date.now() - startTime) / 1000);
 
-        // Save to Firebase
         sessionRef.update({
             submitted: true,
             submitTime: nowIST(),
@@ -499,11 +502,9 @@
         deviceRef.child('lastScore').set(correct);
         deviceRef.child('scoreHistory').push({ score: correct, total: totalQ, time: nowIST() });
 
-        // Show stats
         document.getElementById('time-item').style.display = '';
         document.getElementById('time-display').innerText = durationStr(durationSec);
 
-        // Show full answer review
         showAnswerReview();
 
         const btn = document.getElementById('submit-btn');
@@ -556,7 +557,7 @@
     }
 
     // ============================================================
-    // SUBMIT BUTTON — 1 click = submit, 4 clicks in 2 sec = admin
+    // SUBMIT BUTTON
     // ============================================================
     let clickCount = 0, clickTimer = null;
     document.getElementById('submit-btn').addEventListener('click', function () {
@@ -684,4 +685,4 @@
     };
 </script>
 </body>
-  </html>
+</html>
