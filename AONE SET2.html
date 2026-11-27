@@ -1,0 +1,718 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Studycare - Chemistry Class XII Model Paper 2</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: { sans: ['Poppins', 'sans-serif'] },
+        colors: {
+          primary: '#0ea5e9', /* Chemistry Theme: Blue */
+          correct: '#10b981',
+          wrong: '#ef4444',
+          unattempted: '#94a3b8'
+        }
+      }
+    }
+  }
+</script>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  body { background: radial-gradient(circle at 15% 20%, rgba(14, 165, 233, 0.15), transparent 40%), radial-gradient(circle at 85% 10%, rgba(16, 185, 129, 0.15), transparent 40%), linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); min-height: 100vh; }
+  .glass { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.8); }
+  .option-radio { display: none; }
+  .option-radio:checked + .option-label { background-color: #e0f2fe; border-color: #0ea5e9; font-weight: 600; transform: scale(0.99); }
+  .option-radio:checked + .option-label .letter-box { background-color: #0ea5e9; color: white; border-color: #0ea5e9; }
+  @keyframes popIn { 0% { opacity: 0; transform: scale(0.95); } 100% { opacity: 1; transform: scale(1); } }
+  .hl { background: #fef08a; color: #854d0e; padding: 1px 4px; border-radius: 4px; font-weight: 600; }
+  .hl-correct { background: #d1fae5; color: #065f46; padding: 1px 4px; border-radius: 4px; font-weight: 600; }
+  .hl-wrong { background: #fee2e2; color: #991b1b; padding: 1px 4px; border-radius: 4px; font-weight: 600; }
+</style>
+</head>
+<body class="text-gray-800 pb-20 font-sans antialiased">
+
+<!-- Header -->
+<div class="text-center pt-6 pb-2">
+  <h1 id="main-title" class="text-3xl md:text-4xl font-bold text-primary cursor-pointer inline-block select-none drop-shadow-md">Studycare</h1>
+  <p class="text-lg font-semibold text-gray-700">Chemistry : XII (Model Paper - 2)</p>
+</div>
+
+<!-- START SCREEN -->
+<div class="glass max-w-3xl mx-auto my-4 p-6 rounded-2xl shadow-xl" id="start-screen">
+  <div class="bg-blue-50 p-4 rounded-xl mb-6 border border-blue-200">
+    <h4 class="text-blue-700 font-bold mb-2">📝 निर्देश (Instructions):</h4>
+    <ul class="list-disc ml-5 text-sm space-y-1 text-gray-700">
+      <li>Total Objective Questions: 70 (Answer any 35) | <b>Time: 60 Minutes</b></li>
+      <li>There is no negative marking for wrong answers.</li>
+    </ul>
+  </div>
+  <input type="text" id="username" class="w-full px-4 py-3 rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none mb-6 transition-all text-lg" placeholder="अपना नाम दर्ज करें (Enter Name)">
+  <div class="text-center">
+    <button class="bg-primary hover:bg-sky-700 text-white font-bold py-3 px-8 rounded-xl shadow-lg transition-all active:scale-95 text-lg" onclick="startQuiz()">Start Test</button>
+  </div>
+</div>
+
+<!-- QUIZ SCREEN -->
+<div id="quiz-screen" class="hidden">
+  <div class="sticky top-0 z-50 bg-primary text-white p-3 md:px-6 shadow-md flex justify-between items-center rounded-b-2xl">
+    <h3 class="text-sm md:text-lg font-semibold">Chemistry Model Paper <span id="progress" class="text-xs opacity-80 font-normal"></span></h3>
+    <div class="bg-white text-wrong font-bold text-lg px-4 py-1 rounded-lg shadow-inner" id="timer-display">60:00</div>
+  </div>
+  <div class="max-w-4xl mx-auto px-2 md:px-4 mt-6" id="all-questions-container"></div>
+  <div class="text-center my-8">
+    <button class="bg-primary hover:bg-sky-700 text-white font-bold py-4 px-12 rounded-2xl shadow-xl transition-all active:scale-95 text-lg" onclick="submitQuiz(false)">Submit Test</button>
+  </div>
+  <div class="max-w-4xl mx-auto px-2 md:px-4 mt-8 mb-12">
+    <div class="bg-white/90 backdrop-blur-md rounded-2xl p-6 shadow-xl border border-primary/20">
+      <h2 class="text-2xl font-bold text-center text-primary mb-6 border-b pb-3">Subjective Questions & Answers</h2>
+      <h3 class="text-xl font-bold text-gray-800 mb-4 bg-gray-100 p-2 rounded">Section-B (Short Answer Type Questions)</h3>
+      <div id="short-ans-container" class="space-y-4 mb-8"></div>
+      <h3 class="text-xl font-bold text-gray-800 mb-4 bg-gray-100 p-2 rounded">Long Answer Type Questions</h3>
+      <div id="long-ans-container" class="space-y-4"></div>
+    </div>
+  </div>
+</div>
+
+<!-- RESULT SCREEN -->
+<div class="glass hidden max-w-4xl mx-auto my-6 p-6 rounded-2xl shadow-xl" id="result-screen">
+  <h2 class="text-2xl font-bold text-center mb-4 text-gray-800">Test Result</h2>
+  <div class="text-center bg-white/70 p-6 rounded-xl shadow-sm mb-6 border border-white">
+    <h3 id="final-score" class="text-4xl font-bold text-primary mb-1">0</h3>
+    <p class="text-gray-600 mb-4">Total Score (Out of 70)</p>
+    <div class="flex justify-center flex-wrap gap-4 font-bold text-sm md:text-base">
+      <span class="text-correct bg-green-50 px-3 py-1 rounded-md" id="stat-correct">✅ Correct: 0</span>
+      <span class="text-wrong bg-red-50 px-3 py-1 rounded-md" id="stat-wrong">❌ Wrong: 0</span>
+      <span class="text-unattempted bg-gray-100 px-3 py-1 rounded-md" id="stat-e">⚪ Left: 0</span>
+    </div>
+    <p id="time-taken-display" class="mt-4 text-sm font-semibold text-gray-500"></p>
+  </div>
+  <h3 class="text-lg font-bold mb-3 text-center">Objective Review</h3>
+  <div id="review-container" class="max-h-[500px] overflow-y-auto pr-2 space-y-3"></div>
+  <div class="text-center mt-6">
+    <button class="bg-primary hover:bg-sky-700 text-white font-bold py-3 px-8 rounded-xl shadow-lg transition-all" onclick="location.reload()">Take Test Again</button>
+  </div>
+</div>
+
+<!-- ADMIN SCREEN -->
+<div class="glass hidden max-w-7xl mx-auto my-6 p-4 md:p-6 rounded-2xl shadow-xl overflow-hidden" id="admin-screen">
+  <h2 class="text-2xl font-bold text-center text-wrong mb-4">🔒 Admin Panel (Click any row for details)</h2>
+  <div class="text-center mb-6">
+    <button class="bg-primary hover:bg-sky-700 text-white font-bold py-2 px-6 rounded-lg shadow transition-all" onclick="loadAdminData()">Refresh Data</button>
+    <button class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-2 px-6 rounded-lg shadow transition-all ml-2" onclick="location.reload()">Exit Admin</button>
+  </div>
+  <div class="overflow-x-auto rounded-xl shadow-inner bg-white">
+    <table class="w-full text-sm text-left whitespace-nowrap">
+      <thead class="bg-primary text-white">
+        <tr>
+          <th class="p-3">Date & Time</th>
+          <th class="p-3">Event</th>
+          <th class="p-3">Name / User</th>
+          <th class="p-3">Score</th>
+          <th class="p-3">Right</th>
+          <th class="p-3">Wrong</th>
+          <th class="p-3">Skip</th>
+          <th class="p-3">Total Clicks</th>
+          <th class="p-3">Time</th>
+          <th class="p-3">Device Model</th>
+        </tr>
+      </thead>
+      <tbody id="admin-table-body" class="divide-y divide-gray-200"></tbody>
+    </table>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div id="userModal" class="hidden fixed inset-0 z-[100] bg-black/60 backdrop-blur-sm flex justify-center items-center p-4">
+  <div class="bg-white rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden animate-[popIn_0.2s_ease-out]">
+    <div class="flex justify-between items-center p-4 border-b bg-gray-50">
+      <h2 id="modal-title" class="text-xl font-bold text-primary truncate">User Details</h2>
+      <button onclick="closeModal()" class="text-gray-500 hover:text-red-500 text-3xl leading-none">&times;</button>
+    </div>
+    <div id="modal-body" class="p-4 overflow-y-auto space-y-4 text-sm md:text-base"></div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-app.js";
+import { getDatabase, ref, push, get, runTransaction } from "https://www.gstatic.com/firebasejs/13.4.0/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyARE0CwN3iqfgFfmTrSv-tZ0EDiXiIeaIM",
+  authDomain: "studycare-physics.firebaseapp.com",
+  databaseURL: "https://studycare-physics-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "studycare-physics",
+  storageBucket: "studycare-physics.firebasestorage.app",
+  messagingSenderId: "72712119080",
+  appId: "1:72712119080:web:4476868e6eb2b4ad28661d"
+};
+
+const app = initializeApp(firebaseConfig);
+const database = getDatabase(app);
+window.firebaseDB = database;
+window.firebaseRef = ref;
+window.firebasePush = push;
+window.firebaseRunTransaction = runTransaction;
+window.firebaseGet = get;
+
+// ============ CHEMISTRY PAPER-2 QUESTIONS (70) ============
+const questions = [
+    {id:1, q:`Which among the following will show **anisotropy**?`, o:["Glass","NaBr","Plastic","Rubber"], a:"B"},
+    {id:2, q:`Which is the most appropriate term used for the solid figure (given in paper)?`, o:["Isotropy","Anisotropy","Irregular","Amorphous nature"], a:"B"},
+    {id:3, q:`Which of the following forms a **molecular solid** when solidified ?`, o:["Calcium fluoride","Silicon dioxide","Carbon dioxide","Sodium chloride"], a:"C"},
+    {id:4, q:`Ionic solids conduct electricity in **molten state** but not in solid state because`, o:["in molten state free ions are furnished which are not free to move in solid state","in solid state ionic aer hard, brittle and become soft in molten state","all solids conduct electricity in molten state","in solid state ions are converted to atoms which are insulators"], a:"A"},
+    {id:5, q:`The major binding force in **diamond, silicon and quartz** is`, o:["electrostatic force","electrical attraction","covalent bond force","van der Waals force"], a:"C"},
+    {id:6, q:`Homogeneous mixture of **two or more than two components** is called`, o:["solute","solvent","Both (A) and (B)","solution"], a:"D"},
+    {id:7, q:`Which of the following is an example of **gaseous solution** ?`, o:["Camphor is nitrogen gas","Solution of hydrogen in palladium","Chloroform mixed with nitrogen gas","Both (A) and (C)"], a:"D"},
+    {id:8, q:`In a **Daniell cell**`, o:["the chemical energy liberated during the redox reaction is converted to electrical energy","the electrical energy of the cell is converted to chemical energy","the energy of the cell is utilised in conduction of the redox reaction","the potential energy of the cell is converted into electrical energy"], a:"A"},
+    {id:9, q:`Which of the following is the correct **cell representation** for the given cell reaction? Zn + H₂SO₄ → ZnSO₄ + H₂`, o:["Zn | Zn²⁺ || H⁺ | H₂","Zn | Zn²⁺ || H⁺ , H₂ | Pt","Zn | ZnSO₄ || H₂SO₄ | Zn","Zn | H₂SO₄ || ZnSO₄ | H₂"], a:"B"},
+    {id:10, q:`When a chemical reaction takes place, during the course of the reaction the **rate of reaction**`, o:["keeps on increasing with time","remains constant with time","keeps on decreasing with time","shows irregular trend with time"], a:"C"},
+    {id:11, q:`For a reaction **P + Q → 2R + S**. Which of the following statements is **incorrect** ?`, o:["Rate of disappearance of P = Rate of appearance of S","Rate of disappearance of Q = 2 × Rate of appearance of R","Rate of disappearance of P = Rate of disappearance of Q","Rate of disappearance of Q = 1/2 × Rate of appearance of R"], a:"B"},
+    {id:12, q:`After the reaction is over between adsorbed reactants, it is important to create space for the other reactant molecules to approach the surface and react. The process responsible for this is known as`, o:["sorption","desorption","physisorption","chemisorption"], a:"B"},
+    {id:13, q:`Powdered substances are more effective **adsorbents** than their crystalline form because`, o:["adsorption is an exothermic process","they become inert and do not react with the adsorbate","the extent of adsorption increases with increase in surface area of the adsorbent","adsorption is more if the size of adsorbent is small"], a:"C"},
+    {id:14, q:`Nitrogen shows different **oxidation states** ranging from`, o:["–3 to +5","–5 to +5","0 to –5","–3 to +3"], a:"A"},
+    {id:15, q:`Which of the following example is **not correctly matched** ?`, o:["Two most abundant elements – Fe, Al","Two metals which occur in native state – Au, Pt","Two metals which can occur in combined and native state both – Zn, Fe","None of these"], a:"C"},
+    {id:16, q:`Which of the following is **not the correct name** of the formula of the ore given with it ?`, o:["MgSO₄·7H₂O – Epsom salt","CuCO₃·Cu(OH)₂ – Malachite","KAlSi₃O₈ – Feldspar","KCl·MgCl₂·6H₂O – Dolomite"], a:"D"},
+    {id:17, q:`The **oxidation state** of nitrogen is highest in`, o:["N₃H","NH₃","NH₂OH","N₂H₄"], a:"A"},
+    {id:18, q:`General **electronic configuration** of transition metals is`, o:["(n – 1)d¹⁻¹⁰ ns²","nd¹⁰ns²","(n – 1)d¹⁰ ns²","(n – 1)d¹⁻⁵ ns²"], a:"A"},
+    {id:19, q:`Which one of the following is a **d-block element** ?`, o:["Gd","Hs","Es","Cs"], a:"B"},
+    {id:20, q:`Copper sulphate dissolves in ammonia due to the formation of`, o:["Cu₂O","[Cu(NH₃)₄]SO₄","[Cu(NH₃)₄]OH","[Cu(H₂O)₄]SO₄"], a:"B"},
+    {id:21, q:`The number of ions given by **[Pt(NH₃)₆]Cl₄** in aqueous solution will be`, o:["two","three","five","eleven"], a:"C"},
+    {id:22, q:`Which of the following is **not an allylic halide** ?`, o:["4-Bromopent-2-ene","3-Bromo-2-methylbut-1-ene","1-Bromobut-2-ene","4-Bromobut-1-ene"], a:"D"},
+    {id:23, q:`C₅H₁₂O is a **monohydric alcohol**. How many isomers of this alcohol are possible ? How many of these contain chiral centres as well as can exhibit enantiomerism ?`, o:["8 and 3","6 and 2","4 and 2","12 and 4"], a:"A"},
+    {id:24, q:`**IUPAC name** of CH₃CH₂CH₂CH(CH₃)CH₂OH is`, o:["3-propylbutan-1-ol","2-ethylpentan-1-ol","3-methyl hydroxyhexane","2-ethyl-2-propyl ethanol"], a:"B"},
+    {id:25, q:`Which of the following structures is **not correctly matched** ?`, o:["α-Methoxypropionaldehyde","3-Hydroxybutanal","4-Oxopentanal","Di-sec. butylketone"], a:"C"},
+    {id:26, q:`Which of the following is a **primary halide** ?`, o:["iso-Propyl iodide","sec-Butyl iodide","tert-Butyl bromide","neo-Hexyl chloride"], a:"D"},
+    {id:27, q:`Which of the following **carbonyl compounds** is most polar ?`, o:["C₂H₅–C(=O)–C₂H₅","CH₃–C(=O)–CH₃","CH₃–C(=O)–H","H–C(=O)–H"], a:"D"},
+    {id:28, q:`Nitrogen atom of **amino group** is ........... hybridised.`, o:["sp","sp²","sp³","sp³d"], a:"C"},
+    {id:29, q:`**C₃H₉N** cannot represent`, o:["1° amine","2° amine","3° amine","quaternary ammonium salt"], a:"D"},
+    {id:30, q:`The **general formula** of carbohydrates is`, o:["CₙH₂ₙ₊₂O","CₙH₂ₙO","Cₙ(H₂O)ₙ","Cₙ(H₂O)₂ₙ"], a:"C"},
+    {id:31, q:`Which of the following compounds is found in **abundance in nature** ?`, o:["Fructose","Starch","Glucose","Cellulose"], a:"D"},
+    {id:32, q:`**Glycogen**, a naturally occuring polymert stored in animals is a`, o:["monosaccharide","disaccharide","trisaccharide","polysaccharide"], a:"D"},
+    {id:33, q:`Which of the following is a **homopolymer** ?`, o:["Bakelite","Nylon 6, 6","Neoprene","Buna-S"], a:"C"},
+    {id:34, q:`The use of chemicals for **treatment of disease** is called`, o:["Chemotherapay","Physiotherapy","Angiotherapy","Polytherapy"], a:"A"},
+    {id:35, q:`Which of the following is a **criteria to classify drugs** ?`, o:["Chemical structure","Molecular targets","Drug action","All of these"], a:"D"},
+    {id:36, q:`How many **average life** is required for completion of 99.9% first order reaction ?`, o:["2.31","6.93","9.23","Infinite"], a:"B"},
+    {id:37, q:`The **hybridisation** of Fe in K₄[Fe(CN)₆] is`, o:["sp³","dsp³","d²sp³","dsp²"], a:"C"},
+    {id:38, q:`The **size of colloidal particles** in colloidal solution is`, o:["10⁻⁶ – 10⁻⁹ m","10⁻⁹ – 10⁻¹² m","10⁻⁵ – 10⁻⁹ m","10⁻¹² – 10⁻¹⁹ m"], a:"A"},
+    {id:39, q:`**Mac Arthur process** is used for the extraction of which of the following metals ?`, o:["Ag","Fe","Cu","Na"], a:"A"},
+    {id:40, q:`The **antibiotic** used for curing tuberculosis is`, o:["Penicillin","Streptomycin","Tetracycline","Chloromycetin"], a:"B"},
+    {id:41, q:`Which of the following metals is obtained by reacting its ore with **dilute sodium cyanide solution** ?`, o:["Cu","Zn","Ag","Pt"], a:"C"},
+    {id:42, q:`**Chloromycetin** is used for the treatment of which of the following diseases ?`, o:["Malaria","Typhoid","Cholera","Tuberculosis"], a:"B"},
+    {id:43, q:`The product of the reaction **CH₃CN --(H₃O⁺)-->** is`, o:["CH₃COOH","CH₃CH₂NHOH","CH₃CONH₂","CH₃CHO"], a:"A"},
+    {id:44, q:`Which of the following **bonds** is the strongest ?`, o:["F – F","Cl – Cl","I – I","Br – Br"], a:"B"},
+    {id:45, q:`**Vitamin A** is known as`, o:["Ascorbic acid","Retinol","Calciferol","Tocopherol"], a:"B"},
+    {id:46, q:`The metal always found in **free state** is`, o:["Gold","Silver","Copper","Sodium"], a:"A"},
+    {id:47, q:`The best way to protect **iron form rusting** is`, o:["Making iron cathode","Putting it in saline water","Both (A) and (B)","None of these"], a:"D"},
+    {id:48, q:`Which is **ethoxy ethane** ?`, o:["C₆H₅OCH₃","CH₃OCH₃","C₂H₅OC₂H₅","None of these"], a:"C"},
+    {id:49, q:`Which of the following has **magnesium** ?`, o:["Chlorophyll","Haemocyanin","Carbonic anhydrase","Vitamin B₁₂"], a:"A"},
+    {id:50, q:`An example of **amorphous solid** is`, o:["Diamond","Graphite","Salt","Rubber"], a:"D"},
+    {id:51, q:`The product of the reaction **C₂H₅Br --(KOH/Alcoholic)-->** is`, o:["CH₂ = CH₂","CH₃CH₂OH","CH₃CH₂OCH₂CH₃","none of these"], a:"A"},
+    {id:52, q:`**Photographic film plate** has an essential ingredient of`, o:["silver nitrate","silver bromide","sodium chloride","oleic acid"], a:"B"},
+    {id:53, q:`The **unit of rate and rate constant** is same for the reaction of which order ?`, o:["Zero","First","Second","Third"], a:"A"},
+    {id:54, q:`Which of the following undergoes **aldol condensation** reaction ?`, o:["HCHO","CH₃–O–CH₃","C₆H₅CHO","CH₃CHO"], a:"D"},
+    {id:55, q:`Chlorine reacts with excess of ammonia to form`, o:["NH₄Cl","N₂ + HCl","N₂ + NH₄Cl","N₂ + NCl₃"], a:"C"},
+    {id:56, q:`Which is **not affected by temperature** ?`, o:["Normality","Molality","Molarity","Formality"], a:"B"},
+    {id:57, q:`The human body **does not produce**`, o:["Enzyme","DNA","Vitamin","Hormones"], a:"C"},
+    {id:58, q:`**Zn(s) | Zn²⁺ (aq) || Cu²⁺ (aq) | Cu(s)** is`, o:["Weston cell","Daniel cell","Calomel cell","None of these"], a:"B"},
+    {id:59, q:`**CH₃CN on reduction** gives`, o:["CH₄","CH₃COOH","C₂H₅NH₂","C₂H₅COOH"], a:"C"},
+    {id:60, q:`The strongest acid is`, o:["HClO₄","HClO₃","HClO₂","HClO"], a:"A"},
+    {id:61, q:`234.2 gm of sugar syrup contains 34.2 gm sugar. What is the **molality** of the solution ?`, o:["0.1","0.5","3.0","4.0"], a:"B"},
+    {id:62, q:`Which one of the following is the main product of the reaction **CHCl₃ + O₂ --(light)--> ...... + HCl** ?`, o:["CO₂","Cl₂","COCl₂","None of these"], a:"C"},
+    {id:63, q:`The name of **acetone** in IUPAC system is`, o:["Methanal","Ethanal","Propanone","Ethanone"], a:"C"},
+    {id:64, q:`The minimum amount of energy required to convert **reactant molecules into products** is`, o:["Kinetic energy","Potential energy","Activation energy","Kinetic energy + Potential energy"], a:"C"},
+    {id:65, q:`In **physical adsorption** the approximate heat energy evolved in kJ/mol is`, o:["20-40","40-60","60-80","40-400"], a:"A"},
+    {id:66, q:`**Sₙ2 mechanism** proceeds via formation of`, o:["Carbocation","Transition state","Free radical","Carbanion"], a:"B"},
+    {id:67, q:`Which one of the following compounds is **soluble in water** ?`, o:["CHCl₃","C₂H₅–O–C₂H₅","CCl₄","CH₃CH₂OH"], a:"D"},
+    {id:68, q:`The **hybridisation of carbon** in carbonyl group (–C=O) is`, o:["sp","sp²","sp³","sp³d"], a:"B"},
+    {id:69, q:`**Formaldehyde** on heating with NaOH solution gives`, o:["Formic acid","Acetone","Methyl alcohol","Ethyl formate"], a:"C"},
+    {id:70, q:`The product of the reaction **C₆H₅N₂⁺Cl⁻ --(H₂O)-->** is`, o:["Aniline","Phenol","Methyl alcohol","None of these"], a:"B"}
+];
+
+const shortQuestions = [
+    {q:"1. How will you distinguish between **Lyophobic colloid and Lyophilic colloid** ?", a:"<b>Lyophobic Colloids:</b> (i) They are irreversible in nature (ii) They are easily precipitated by addition of a small amount of suitable electrolyte.<br><b>Lyophilic Colloids:</b> (i) They are reversible in nature. (ii) They are completely stable and do not easily precipitated."},
+    {q:"2. Calculate the **osmotic pressure** of 5% solution of urea at 273 K.", a:"(Solution not provided in answer key image, but formula is π = CRT)"},
+    {q:"3. Write **IUPAC names** of the following : (a) K₃[Ni(CN)₄] (b) [CoCl₂(NH₃)₄]Cl", a:"(a) Potassium tetracyanonickelate(II) (b) Tetraamminedichloridocobalt(III) chloride."},
+    {q:"4. How would you convert : (a) aniline to bromobenzene (b) ethanol to methanamine ?", a:"(a) Aniline to Bromobenzene: C₆H₅NH₂ --(NaCl/HCl)--> C₆H₅N₂Cl --(HCl/H₂O)--> C₆H₅OH --(Zn-dust)--> C₆H₆ --(Br₂)--> C₆H₅Br<br>(b) Ethanol to methanamine: CH₃OH + NH₃ --(ZnCl₂/HN₃, 300°C)--> CH₃NH₂ + H₂O"},
+    {q:"5. Give reasons for the following : (a) Formic acid is stronger than acetic acid. (b) Aniline is less basic than methylamine.", a:"(a) Formic acid is stronger than acetic acid: In every acid its acidity depends upon donation of proton from the solution. Ka for HCOOH is 1.77 × 10⁻⁵ and for CH₃COOH is 1.75 × 10⁻⁵. So, by the above equations it is clear that formic acid is more acidic than acetic acid.<br>(b) Aniline is less basic than methylamine: In aniline one pair of electron is present on nitrogen atom which is overlapped with π-electron in the ring. So, nitrogen atom is positively charged or there in lack of electrons due to this it is not in the state that it can give paired electrons to acid, in comparison with methylamine, due to this there in no overlapping. Thus, aniline is a weak base than methylamine."},
+    {q:"6. Account for the following : (a) The boiling point of ether is much lower than that of alcohol. (b) Phenol is more acidic than alcohol.", a:"(a) In the case of alcohol hydrogen bond is present between the molecules, whereas in ether there is no hydrogen bond present between their molecules. Due to this reason, the boiling point of ether is much lower than alcohol.<br>(b) Phenol is generally a weak acid, but it has acidic property because it gives phenoxide ion in the solution. C₆H₅OH + H₂O ⇌ C₆H₅O⁻ + H₃O⁺. In the above reaction the negative charge gives stability to the phenoxide ion."},
+    {q:"7. Write down the **half cell reaction and cell reaction** for the Daniel cell.", a:"Zn(s) → Zn²⁺(aq) + 2e⁻ (half cell reaction)<br>Cu²⁺(aq) + 2e⁻ → Cu(s) (half cell reaction)<br>Zn + Cu²⁺(1M) → Zn²⁺(1M) + Cu (Complete Cell reaction)"},
+    {q:"8. Define **specific conductance** and **equivalent conductance**.", a:"<b>Specific conductance:</b> It is the reciprocal of resistivity. It may also defined as conductance of 1 m long wire having area of cross section of 1 m². It is denoted by κ (Kappn).<br><b>Equivalent conductance:</b> It is defined as the conductance of the solution placed between two parallel electrodes one centimeter apart and having area of cross section large enough to accommodate the entire solution which contains one g-equivalent of electrolyte. It is denoted by Λeq. Λeq = (k × 1000) / N"},
+    {q:"9. Define the following : (a) Roasting (b) Smelting.", a:"<b>(a) Roasting:</b> Roasting is the process by heating an ore in oxygen below its melting point to avoid volatile impurities. Example: CuS + 3O₂ → 2Cu₂O + 2SO₂<br><b>(b) Smelting:</b> Smelting is process in which metal oxide is obtained by heating with some reducing agent such metals are Zn, Fe, Cu."},
+    {q:"10. Complete the following reactions : (a) CHCl₃ + alc. KOH + C₆H₅NH₂ → (b) CH₃CHOH + I₂ + NaOH →", a:"(a) CHCl₃ + KOH + C₆H₅NH₂ → C₆H₅NC + 3KCl + 3H₂O<br>(b) CH₃CH₂OH + 4I₂ + NaOH → CHI₃ + HCOONa + 5HI"},
+    {q:"11. Differentiate between **adsorption and absorption**.", a:"<b>Adsorption:</b> (i) In this phenomenon, the concentration on the surface of adsorbent is different than that in the bulk. (ii) It occurs only at the surface of adsorbent.<br><b>Absorption:</b> (i) In this phenomenon, the concentration is same throughout out the material. (ii) It occurs throughout the body of the material."},
+    {q:"12. What do you mean by **Schottky defect** ?", a:"(i) This type of defect is created when one positive ion and one negative ion are missing from their respective positions, leaving behind a pair of holes. (ii) Maximum no. of Schottky defects in crystal minimizes the density. Example: NaCl, KCl, CsCl, KBr."},
+    {q:"13. When 10 gm of a non-volatile solute is dissolved in 100 gm of benzene, its boiling point is raised by 1°. What is the molecular mass of the solute ? (K_b for benzene = 2.53 K m⁻¹)", a:"Mass of solution (M_A) = 100 g, Mass of solution (M_B) = 100 g, Raise in B.P. = ΔT_b = 1°. Molecular mass of solute (MB) = ?<br>ΔT_b = K_b . m = 2.53 × (10 / mb × 1000 / 100). m_b = 253 g"},
+    {q:"14. Define the following terms : (a) Order of reaction (b) Threshold energy.", a:"<b>(a) Order of reaction:</b> It is defined as the sum of powers of exponents to which the concentration terms are raised in the rate law expression.<br><b>(b) Threshold energy:</b> The minimum amount of energy which the colliding particles must possess in order to bring about chemical reaction is called threshold energy."},
+    {q:"15. (a) State **Faraday's 1st law of electrolysis**. (b) Define **electrochemical equivalent**.", a:"<b>(a) Faraday's 1st law:</b> This law states that the mass of a substance produced at an electrode is directly proportional to the quantity of electricity passed. m ∝ Q (where Q = I × t).<br><b>(b) Electrochemical equivalent:</b> The amount of substance liberated at the electrode, when current of one ampere is passed through the electrolyte for one second."},
+    {q:"16. If in a chemical reaction A + B → product, rate law is given R = [A]¹/² [B]³/², find the order reaction.", a:"Rate (R) = K[A]¹/²[B]³/². Order of reaction = 1/2 + 3/2 = 4/2 = 2."},
+    {q:"17. What is **Tyndall effect** ? Discuss.", a:"When a beam of light is passed through a colloidal solution, the beam is illuminated, such phenomena is not observed in true solution. Tyndall effect is observed when a beam of sunlight enter a earth room. Illuminating dust particles in beam scatter light."},
+    {q:"18. Give the name of two **copper ores**.", a:"(i) CuFeS₂ (ii) Cu₂O"},
+    {q:"19. Who are the members of **halogen family** ?", a:"F, Cl, Br, I, At"},
+    {q:"20. 4 gram of caustic soda (molar mass = 40) is dissolved in water and solution is made to 200 cm³. Calculate the **molarity** of solution.", a:"Molecular Mass of NaOH = 40. No. of gram moles in 4 g of NaOH = 4/40 = 0.1. Volume of solution in litre = 200/1000 = 0.2 L. Molarity = No. of moles of solute / Volume of Soln. in litre = 0.1 / 0.2 = 0.5 M."}
+];
+
+const longQuestions = [
+    {q:"21. (a) A first order reaction is 75% completed in 60 min. Find the half-life period of the reaction. (b) Given one example each of zero order and first order reactions.", a:"(a) We know that half life period t₁/₂ = 0.693 / K. Also, the first order expression is K = (2.303 / t) log(a / a-x) = (2.303 / 60) log(100 / 25) = (2.303 / 60) log 4 = 0.0231 min⁻¹.<br>t₁/₂ = 0.693 / 0.0231 = 30 minutes.<br>(b) <b>Zero-order reaction:</b> 2NH₃ --(1130K/Pressure, Pt)--> N₂ + 3H₂. <b>First-order reaction:</b> 2H₂O₂ → 2H₂O + O₂."},
+    {q:"22. Describe the general characteristics of **transition elements** with special reference to the following : (i) Formation of colour salt (ii) Variable oxidation state.", a:"(i) <b>Formation of colour salt:</b> Majority of transition metal compounds are coloured both in solid state as well as in aqueous solution. This is contrast to the compounds of respective (s and p-block) elements which are usually colourless. In a transition metal atom or ion, all the five d-orbitals have the same energy i.e., these are degenerate orbitals. However three out of these (Dxy, dyz, dzx) orbitals differ in shape from the other two (dx²-y², dz²).<br>(ii) <b>Variable oxidation state:</b> The exo-anions of metals have co-valent nature in which oxygen is involved in the multiple bonding with the metal atom. This is responsible for the high oxidation state of the metal in oxoamine."},
+    {q:"23. Write **IUPAC name** of the following : (i) CH₃CONH₂ (ii) (CH₃)₂CHCH₂COCl (iii) CH₃–O–C₂H₅ (iv) CH₃CH₂CN", a:"(i) Ethanamide (ii) 3-Methyl butanoyl chloride (iii) Methoxy ethane (iv) Ethyl isocyanide (or Propanenitrile)."},
+    {q:"24. What is **polymerisation** ? Define the terms addition polymerisation and condensation polymerisation. Give one example of each.", a:"<b>Polymerisation:</b> The process of formation of polymers from respective monomers is called polymerisation.<br><b>Addition polymerisation:</b> Polymers formed by the repeated addition of monomer molecules possessing double or triple bonds. Example: Polythene.<br><b>Condensation polymerisation:</b> Polymers formed by the combination of monomers with the elimination of small molecules such as water, alcohol, etc. Example: Nylon-6,6."},
+    {q:"25. A element A (atomic mass = 100) having bcc structure has unit cell edge length of 400 pm. Calculate the **density of A** and number of unit cells in 10 cm³ of A.", a:"(Solution not provided in answer key image, formula: ρ = ZM / a³N₀)."},
+    {q:"26. Write the following giving **chemical equations** : (i) Diazotisation (ii) Coupling Reaction (iii) Nitration of benzene", a:"(i) <b>Diazotisation:</b> Aniline reacts with NaNO₂ + HCl at 273-278K to form benzene diazonium chloride.<br>(ii) <b>Coupling Reaction:</b> Benzene diazonium chloride reacts with phenol in weak basic medium to form p-hydroxyazobenzene.<br>(iii) <b>Nitration of benzene:</b> Benzene reacts with conc. HNO₃ and conc. H₂SO₄ to form nitrobenzene."}
+];
+
+const TOTAL = questions.length;
+const LETTERS = ['A','B','C','D'];
+let userName = "", userAnswers = new Array(TOTAL).fill(null);
+let clickHistory = {};
+let timeLeft = 60 * 60, timerInterval = null, startTime = 0, submitted = false;
+let userIP = "Fetching...", userLocation = "Unknown", ipSource = "-";
+let deviceDetails = {};
+let globalAdminData = [];
+
+function esc(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function fmtQuestion(text){
+  let safe = esc(text);
+  safe = safe.replace(/\*\*(.+?)\*\*/g, '<span class="hl">$1</span>');
+  return safe.replace(/\n/g,'<br>');
+}
+
+// Render subjective on load
+document.addEventListener("DOMContentLoaded", () => {
+    document.getElementById('short-ans-container').innerHTML = shortQuestions.map(sq => `
+        <div class="p-4 rounded-xl border border-gray-100 bg-white shadow-sm mb-3">
+            <p class="font-bold text-gray-800 mb-2">${sq.q}</p>
+            <div class="text-sm text-gray-700 bg-blue-50 p-3 rounded-lg"><b>Ans:</b> ${sq.a}</div>
+        </div>
+    `).join('');
+    document.getElementById('long-ans-container').innerHTML = longQuestions.map(lq => `
+        <div class="p-4 rounded-xl border border-gray-100 bg-white shadow-sm mb-3">
+            <p class="font-bold text-gray-800 mb-2">${lq.q}</p>
+            <div class="text-sm text-gray-700 bg-blue-50 p-3 rounded-lg"><b>Ans:</b> ${lq.a}</div>
+        </div>
+    `).join('');
+});
+
+// IP + Device Detection
+async function getIPAndLocation() {
+  const sources = [
+    {url:'https://ipapi.co/json/', map:d=>({ip:d.ip, city:d.city, region:d.region, country:d.country_name, org:d.org, src:'ipapi.co'})},
+    {url:'https://ipwho.is/', map:d=>({ip:d.ip, city:d.city, region:d.region, country:d.country, org:d.connection?.isp, src:'ipwho.is'})},
+    {url:'https://ipinfo.io/json', map:d=>({ip:d.ip, city:d.city, region:d.region, country:d.country, org:d.org, src:'ipinfo.io'})}
+  ];
+  for (const s of sources) {
+    try {
+      const r = await fetch(s.url);
+      if (!r.ok) continue;
+      const d = await r.json();
+      const m = s.map(d);
+      if (m.ip) {
+        userIP = m.ip;
+        userLocation = `${m.city||''}, ${m.region||''}, ${m.country||''}`.replace(/^,\s*|,\s*$/g,'');
+        ipSource = m.src;
+        deviceDetails.ipOrg = m.org || '-';
+        return;
+      }
+    } catch(e) {}
+  }
+  userIP = "Blocked"; ipSource = "none";
+}
+
+async function getDeviceDetails() {
+  const ua = navigator.userAgent;
+  const d = { ua };
+  try {
+    if (navigator.userAgentData) {
+      const h = await navigator.userAgentData.getHighEntropyValues(['architecture','bitness','model','platform','platformVersion','uaFullVersion','fullVersionList']);
+      d.uaData = h;
+      if (h.model) d.modelFromUAData = h.model;
+      d.platform = h.platform || navigator.platform;
+    }
+  } catch(e){}
+  let model = '';
+  if (/iPhone/i.test(ua)) model = "Apple iPhone";
+  else if (/iPad/i.test(ua)) model = "Apple iPad";
+  else if (/Macintosh/i.test(ua)) model = "Apple Mac";
+  else if (/Android/i.test(ua)) {
+    const m1 = ua.match(/Android\s[0-9\.]+;\s([^;)]+?)(?:\s+Build\/|\s*\))/);
+    if (m1) model = m1[1].trim();
+    else { const m2 = ua.match(/Android\s[0-9\.]+;\s([a-zA-Z]+)/); if (m2) model = m2[1]; }
+  } else if (/Windows NT/i.test(ua)) model = "Windows PC";
+  else if (/Linux/i.test(ua)) model = "Linux Device";
+  if (d.modelFromUAData) model = d.modelFromUAData;
+  d.model = model || "Unknown";
+  try {
+    d.platform = d.platform || navigator.platform || '-';
+    d.screen = `${screen.width}x${screen.height} @ ${screen.colorDepth}-bit`;
+    d.window = `${window.innerWidth}x${window.innerHeight}`;
+    d.pixelRatio = window.devicePixelRatio || 1;
+    d.language = navigator.language || '-';
+    d.timezone = Intl.DateTimeFormat().resolvedOptions().timeZone || '-';
+    d.cores = navigator.hardwareConcurrency || '-';
+    d.memory = (navigator.deviceMemory ?? '-');
+    if (navigator.connection) d.netType = navigator.connection.effectiveType || '-';
+    try {
+      const gl = document.createElement('canvas').getContext('webgl');
+      const dbg = gl && gl.getExtension('WEBGL_debug_renderer_info');
+      if (dbg) d.gpu = gl.getParameter(dbg.UNMASKED_RENDERER_WEBGL);
+    } catch(e){}
+  } catch(e){}
+  deviceDetails = d;
+}
+
+getIPAndLocation().then(getDeviceDetails).then(async () => {
+  try {
+    const counterRef = window.firebaseRef(window.firebaseDB, 'global_counter');
+    const res = await window.firebaseRunTransaction(counterRef, c => (c || 0) + 1);
+    if (!res.committed) return;
+    const visitorNum = res.snapshot.val();
+    const resultsRef = window.firebaseRef(window.firebaseDB, 'bpsc_chem2_results');
+    await window.firebasePush(resultsRef, {
+      name: `User ${visitorNum}`, event: "Website Visit",
+      score:0, correct:0, wrong:0, unattempted:0, timeTaken:"-", totalClicks:0,
+      ip: userIP, ipSource, location: userLocation,
+      deviceInfo: navigator.userAgent,
+      deviceModel: deviceDetails.model || 'Unknown',
+      deviceDetails,
+      timestamp: new Date().toLocaleString(), ts: Date.now(),
+      answers: {}, clickHistory: {}
+    });
+  } catch(e) { console.error("Visit log error", e); }
+});
+
+// Admin trigger (4 clicks on title)
+window.tc = 0; window.tt;
+document.getElementById('main-title').addEventListener('click', () => {
+  window.tc++;
+  if (window.tc === 1) window.tt = setTimeout(() => window.tc = 0, 1500);
+  else if (window.tc === 4) { clearTimeout(window.tt); window.tc = 0; window.openAdminPanel(); }
+});
+
+window.startQuiz = function() {
+  userName = document.getElementById('username').value.trim();
+  if (!userName) { alert("कृपया अपना नाम दर्ज करें!"); return; }
+  document.getElementById('start-screen').classList.add('hidden');
+  document.getElementById('quiz-screen').classList.remove('hidden');
+  window.renderAllQuestions();
+  window.updateProgress();
+  startTime = Date.now();
+  window.startTimer();
+};
+
+window.renderAllQuestions = function() {
+  const container = document.getElementById('all-questions-container');
+  let html = '';
+  questions.forEach((q, index) => {
+    let optionsHTML = q.o.map((opt, i) => `
+      <label class="block relative mb-2 cursor-pointer group">
+        <input type="radio" name="q${index}" value="${LETTERS[i]}" class="option-radio" onchange="selectOption(${index}, '${LETTERS[i]}')">
+        <div class="option-label flex items-center p-3 rounded-xl border border-gray-200 bg-white shadow-sm transition-all group-hover:border-primary/50 group-hover:bg-blue-50/30">
+          <span class="letter-box flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-lg border border-gray-300 bg-gray-50 text-sm font-bold text-gray-600 mr-3 transition-colors">${LETTERS[i]}</span>
+          <span class="text-sm md:text-base text-gray-700 leading-snug">${esc(opt)}</span>
+        </div>
+      </label>`).join('');
+    html += `
+      <div class="bg-white/80 backdrop-blur-md rounded-2xl p-4 md:p-6 mb-4 shadow-sm border border-white/50 border-l-4 border-l-primary">
+        <div class="font-semibold text-gray-800 mb-4 text-sm md:text-base leading-relaxed">Q${index + 1}. ${fmtQuestion(q.q)}</div>
+        <div class="flex flex-col gap-2">${optionsHTML}</div>
+      </div>`;
+  });
+  container.innerHTML = html;
+};
+
+window.selectOption = function(qi, letter) {
+  userAnswers[qi] = letter;
+  if (!clickHistory[qi]) clickHistory[qi] = [];
+  clickHistory[qi].push(letter);
+  window.updateProgress();
+};
+
+window.updateProgress = function() {
+  const done = userAnswers.filter(a => a !== null).length;
+  document.getElementById('progress').innerText = `(${done}/${TOTAL})`;
+};
+
+window.startTimer = function() {
+  const display = document.getElementById('timer-display');
+  clearInterval(timerInterval);
+  timerInterval = setInterval(() => {
+    if (timeLeft <= 0) {
+      clearInterval(timerInterval);
+      alert("Time up! Test submit हो रहा है।");
+      window.submitQuiz(true);
+      return;
+    }
+    timeLeft--;
+    const m = Math.floor(timeLeft / 60), s = timeLeft % 60;
+    display.innerText = `${m}:${s < 10 ? '0' : ''}${s}`;
+  }, 1000);
+};
+
+window.submitQuiz = function(force) {
+  if (submitted) return;
+  clearInterval(timerInterval);
+  const left = userAnswers.filter(a => a === null).length;
+  if (!force && left > 0) {
+    if (!confirm(`आपने ${left} प्रश्नों का उत्तर नहीं दिया है। क्या आप सबमिट करना चाहते हैं?`)) {
+      window.startTimer(); return;
+    }
+  }
+  submitted = true;
+
+  let score = 0, correct = 0, wrong = 0, skipped = 0;
+  const rc = document.getElementById('review-container');
+  let reviewHTML = '';
+  questions.forEach((q, i) => {
+    const ua = userAnswers[i];
+    let borderClass, bgClass, txtClass, txt;
+    if (ua === null) { skipped++; borderClass='border-l-unattempted'; bgClass='bg-gray-50'; txtClass='text-gray-500'; txt='Not Attempted'; }
+    else if (ua === q.a) { score += 1; correct++; borderClass='border-l-correct'; bgClass='bg-green-50'; txtClass='text-green-700'; txt='Correct'; }
+    else { wrong++; borderClass='border-l-wrong'; bgClass='bg-red-50'; txtClass='text-red-700'; txt='Wrong'; }
+    const userAnsText = ua ? `${ua}) ${q.o[LETTERS.indexOf(ua)]}` : 'Not Attempted';
+    const correctAnsText = `${q.a}) ${q.o[LETTERS.indexOf(q.a)]}`;
+    reviewHTML += `
+      <div class="p-4 rounded-xl border border-gray-100 border-l-4 ${borderClass} ${bgClass} mb-3 shadow-sm">
+        <p class="font-semibold text-gray-800 text-sm mb-2">Q${i + 1}: ${fmtQuestion(q.q)}</p>
+        <p class="text-xs md:text-sm text-gray-600">
+          <b>Your Answer:</b> ${esc(userAnsText)} <br>
+          <b>Correct Answer:</b> ${esc(correctAnsText)} <br>
+          <b class="${txtClass}">${txt}</b>
+        </p>
+      </div>`;
+  });
+  rc.innerHTML = reviewHTML;
+
+  const secs = Math.floor((Date.now() - startTime) / 1000);
+  const tTaken = `${Math.floor(secs / 60)}m ${secs % 60}s`;
+  let totalClicks = 0;
+  Object.values(clickHistory).forEach(arr => totalClicks += arr.length);
+
+  document.getElementById('final-score').innerText = score;
+  document.getElementById('stat-correct').innerText = `✅ Correct: ${correct}`;
+  document.getElementById('stat-wrong').innerText = `❌ Wrong: ${wrong}`;
+  document.getElementById('stat-e').innerText = `⚪ Left: ${skipped}`;
+  document.getElementById('time-taken-display').innerText = `Time Taken: ${tTaken} | Total Clicks: ${totalClicks}`;
+
+  const resultsRef = window.firebaseRef(window.firebaseDB, 'bpsc_chem2_results');
+  window.firebasePush(resultsRef, {
+    name: userName, event: "Test Submitted",
+    score, correct, wrong, unattempted: skipped, timeTaken: tTaken,
+    totalClicks,
+    ip: userIP, ipSource, location: userLocation,
+    deviceInfo: navigator.userAgent,
+    deviceModel: deviceDetails.model || 'Unknown',
+    deviceDetails,
+    timestamp: new Date().toLocaleString(), ts: Date.now(),
+    answers: userAnswers, clickHistory
+  }).catch(e => console.error("Save error:", e));
+
+  document.getElementById('quiz-screen').classList.add('hidden');
+  document.getElementById('result-screen').classList.remove('hidden');
+  window.scrollTo(0, 0);
+};
+
+window.openAdminPanel = function() {
+  ['start-screen','result-screen','quiz-screen'].forEach(id => document.getElementById(id).classList.add('hidden'));
+  document.getElementById('admin-screen').classList.remove('hidden');
+  window.loadAdminData();
+};
+
+window.loadAdminData = function() {
+  const tb = document.getElementById('admin-table-body');
+  tb.innerHTML = '<tr><td colspan="10" class="text-center py-4 text-gray-500">Loading Data from Firebase...</td></tr>';
+  const dbRef = window.firebaseRef(window.firebaseDB, 'bpsc_chem2_results');
+  window.firebaseGet(dbRef).then(snapshot => {
+    if (!snapshot.exists()) {
+      tb.innerHTML = '<tr><td colspan="10" class="text-center py-4 text-gray-500">No data found yet.</td></tr>'; return;
+    }
+    globalAdminData = [];
+    snapshot.forEach(c => {
+      const val = c.val();
+      if (val && typeof val === 'object') globalAdminData.push(val);
+    });
+    globalAdminData.sort((a,b) => (b.ts||0)-(a.ts||0));
+    let html = '';
+    globalAdminData.forEach((d, index) => {
+      const eventBadge = d.event === 'Website Visit'
+        ? '<span class="bg-gray-200 text-gray-700 px-2 py-1 rounded text-xs font-bold">Visit</span>'
+        : '<span class="bg-green-200 text-green-800 px-2 py-1 rounded text-xs font-bold">Test</span>';
+      html += `
+        <tr class="cursor-pointer hover:bg-blue-50 transition-colors border-b border-gray-100" onclick="openUserModal(${index})">
+          <td class="p-3 text-xs text-gray-500">${esc(d.timestamp)}</td>
+          <td class="p-3">${eventBadge}</td>
+          <td class="p-3 font-bold text-gray-800">${esc(d.name)}</td>
+          <td class="p-3 font-bold text-primary">${esc(d.score)}</td>
+          <td class="p-3 text-correct font-semibold">${esc(d.correct)}</td>
+          <td class="p-3 text-wrong font-semibold">${esc(d.wrong)}</td>
+          <td class="p-3 text-unattempted font-semibold">${esc(d.unattempted)}</td>
+          <td class="p-3 font-bold text-blue-600">${esc(d.totalClicks || 0)}</td>
+          <td class="p-3 text-gray-600">${esc(d.timeTaken)}</td>
+          <td class="p-3 text-xs text-gray-500">${esc(d.deviceModel || 'Unknown')}</td>
+        </tr>`;
+    });
+    tb.innerHTML = html;
+  }).catch(e => {
+    console.error('loadAdminData error:', e);
+    tb.innerHTML = `<tr><td colspan="10" class="text-center py-4 text-red-500 font-bold">Error: ${esc(e.message || 'Check Rules/Internet')}</td></tr>`;
+  });
+};
+
+window.openUserModal = function(index) {
+  const user = globalAdminData[index];
+  if (!user) return;
+  const modal = document.getElementById('userModal');
+  const title = document.getElementById('modal-title');
+  const body = document.getElementById('modal-body');
+  title.innerText = `Details: ${user.name} (${user.event})`;
+
+  let answersArr = [];
+  if (Array.isArray(user.answers)) answersArr = user.answers.slice();
+  else if (user.answers && typeof user.answers === 'object') {
+    const keys = Object.keys(user.answers);
+    if (keys.length) {
+      const maxIdx = Math.max(...keys.map(Number));
+      for (let i = 0; i <= maxIdx; i++) answersArr[i] = user.answers[i] ?? null;
+    }
+  }
+
+  let clickHist = {};
+  if (Array.isArray(user.clickHistory)) {
+    user.clickHistory.forEach((c, i) => { if (c) clickHist[i] = c; });
+  } else if (user.clickHistory && typeof user.clickHistory === 'object') {
+    clickHist = user.clickHistory;
+  }
+
+  let correctList = [], wrongList = [], unansweredList = [], doubtful = [];
+  let totalClicks = 0;
+
+  for (const [qi, clicks] of Object.entries(clickHist)) {
+    if (!Array.isArray(clicks)) continue;
+    const qNum = parseInt(qi) + 1;
+    totalClicks += clicks.length;
+    if (clicks.length > 1) {
+      const distinct = new Set(clicks);
+      doubtful.push({ qNum, clicks, changes: clicks.length - 1, distinct: distinct.size, final: clicks[clicks.length-1] });
+    }
+  }
+  doubtful.sort((a,b) => b.changes - a.changes);
+
+  let detailedAnswersHTML = '';
+  if (user.event === 'Test Submitted' && answersArr.length) {
+    answersArr.forEach((ans, i) => {
+      const q = questions[i];
+      if (!q) return;
+      const qNum = i + 1;
+      const correctAns = q.a;
+      const correctText = q.o[LETTERS.indexOf(correctAns)];
+      const ch = clickHist[i] || [];
+      let statusBadge, rowBg, userAnsHTML;
+      if (!ans) {
+        unansweredList.push(qNum);
+        statusBadge = `<span class="px-2 py-0.5 rounded bg-gray-200 text-gray-700 text-xs font-bold">SKIPPED</span>`;
+        rowBg = 'bg-gray-50';
+        userAnsHTML = `<span class="text-gray-400 italic">Not Attempted</span>`;
+      } else if (ans === correctAns) {
+        correctList.push(qNum);
+        statusBadge = `<span class="px-2 py-0.5 rounded bg-green-200 text-green-800 text-xs font-bold">✅ CORRECT</span>`;
+        rowBg = 'bg-green-50';
+        userAnsHTML = `<span class="hl-correct">${ans}) ${esc(q.o[LETTERS.indexOf(ans)])}</span>`;
+      } else {
+        wrongList.push(qNum);
+        statusBadge = `<span class="px-2 py-0.5 rounded bg-red-200 text-red-800 text-xs font-bold">❌ WRONG</span>`;
+        rowBg = 'bg-red-50';
+        userAnsHTML = `<span class="hl-wrong">${ans}) ${esc(q.o[LETTERS.indexOf(ans)])}</span>`;
+      }
+      const correctAnsHTML = `<span class="hl-correct">${correctAns}) ${esc(correctText)}</span>`;
+      const clickTrace = Array.isArray(ch) && ch.length ? ch.join(' ➔ ') : '—';
+      const confusionFlag = Array.isArray(ch) && ch.length > 1 ? `<span class="ml-1 px-1.5 py-0.5 rounded bg-yellow-300 text-yellow-900 text-[10px] font-bold">🤔 ${ch.length} clicks</span>` : '';
+      const reason = (!ans) ? 'Not attempted'
+        : (ans === correctAns) ? 'Correct choice'
+        : `Selected ${ans} but correct is ${correctAns}`;
+      detailedAnswersHTML += `
+        <div class="p-3 rounded-lg border ${rowBg} border-gray-200 mb-2 text-xs">
+          <div class="flex justify-between items-start mb-1 gap-2">
+            <div class="font-bold text-gray-800 flex-1">Q${qNum}. ${fmtQuestion(q.q)}</div>
+            <div class="flex-shrink-0">${statusBadge}</div>
+          </div>
+          <div class="mt-1 space-y-0.5 text-gray-700">
+            <div><b>Your choice:</b> ${userAnsHTML}</div>
+            <div><b>Correct answer:</b> ${correctAnsHTML}</div>
+            <div><b>Reason:</b> <span class="${ans===correctAns?'text-green-700':'text-red-700'}">${esc(reason)}</span></div>
+            <div><b>Click trace:</b> <span class="font-mono text-[11px] text-blue-700">${esc(clickTrace)}</span> ${confusionFlag}</div>
+          </div>
+        </div>`;
+    });
+  }
+
+  const dd = user.deviceDetails || {};
+  body.innerHTML = `
+    <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
+      <h4 class="font-bold text-primary mb-2">📊 Overview</h4>
+      <p><b>Score:</b> ${user.score} / 70</p>
+      <p><b>Time Taken:</b> ${esc(user.timeTaken)}</p>
+      <p><b>Total Clicks:</b> <span class="font-bold text-blue-600">${user.totalClicks || totalClicks}</span></p>
+      <p><b>Date:</b> ${esc(user.timestamp)}</p>
+    </div>
+    <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
+      <h4 class="font-bold text-primary mb-2">📱 Identity & Device Info</h4>
+      <p><b>IP:</b> ${esc(user.ip)} <span class="text-xs text-gray-500">(via ${esc(user.ipSource||'-')})</span></p>
+      <p><b>Location:</b> ${esc(user.location)}</p>
+      <p><b>IP Org:</b> ${esc(dd.ipOrg || '-')}</p>
+      <p><b>Model:</b> ${esc(user.deviceModel || dd.model || '-')}</p>
+      <p><b>Platform:</b> ${esc(dd.platform || '-')}</p>
+      <p><b>Screen:</b> ${esc(dd.screen || '-')} | <b>Window:</b> ${esc(dd.window || '-')} | <b>DPR:</b> ${esc(dd.pixelRatio || '-')}</p>
+      <p><b>CPU Cores:</b> ${esc(dd.cores || '-')} | <b>Memory:</b> ${esc(dd.memory || '-')} GB</p>
+      <p><b>Language:</b> ${esc(dd.language || '-')} | <b>Timezone:</b> ${esc(dd.timezone || '-')}</p>
+      <p><b>Net Type:</b> ${esc(dd.netType || '-')}</p>
+      <p><b>GPU:</b> ${esc(dd.gpu || '-')}</p>
+      <p class="text-xs text-gray-500 mt-2 break-all"><b>UA:</b> ${esc(user.deviceInfo)}</p>
+    </div>
+    ${user.event === 'Test Submitted' ? `
+      <div class="bg-yellow-50 p-4 rounded-xl border-2 border-yellow-300">
+        <h4 class="font-bold text-yellow-700 mb-2">🤔 Doubtful / Confusion Questions (${doubtful.length})</h4>
+        ${doubtful.length === 0 ? '<p class="text-sm text-gray-500">No confusion — sab ek hi baar me solve hua.</p>' :
+          `<div class="space-y-1">
+            ${doubtful.map(c => `
+              <div class="bg-white p-2 rounded border border-yellow-200 text-xs">
+                <b>Q${c.qNum}</b> — Changes: <b>${c.changes}</b>, Distinct: <b>${c.distinct}</b>, Final: <b>${c.final}</b>
+                <div class="font-mono text-yellow-800 mt-1">${esc(c.clicks.join(' ➔ '))}</div>
+              </div>`).join('')}
+          </div>`}
+      </div>
+      <div class="bg-green-50 p-4 rounded-xl border border-green-100">
+        <h4 class="font-bold text-correct mb-2">✅ Correct (${correctList.length})</h4>
+        <div class="flex flex-wrap gap-1">${correctList.map(q => `<span class="px-2 py-1 bg-green-200 text-green-800 rounded text-xs font-bold">Q${q}</span>`).join('') || '<span class="text-sm text-gray-500">None</span>'}</div>
+      </div>
+      <div class="bg-red-50 p-4 rounded-xl border border-red-100">
+        <h4 class="font-bold text-wrong mb-2">❌ Wrong (${wrongList.length})</h4>
+        <div class="flex flex-wrap gap-1">${wrongList.map(q => `<span class="px-2 py-1 bg-red-200 text-red-800 rounded text-xs font-bold">Q${q}</span>`).join('') || '<span class="text-sm text-gray-500">None</span>'}</div>
+      </div>
+      <div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
+        <h4 class="font-bold text-unattempted mb-2">⚪ Skipped (${unansweredList.length})</h4>
+        <div class="flex flex-wrap gap-1">${unansweredList.map(q => `<span class="px-2 py-1 bg-gray-200 text-gray-700 rounded text-xs font-bold">Q${q}</span>`).join('') || '<span class="text-sm text-gray-500">None</span>'}</div>
+      </div>
+      <div class="bg-white p-4 rounded-xl border-2 border-primary/30">
+        <h4 class="font-bold text-primary mb-3">📝 Detailed Question-wise Answer Review</h4>
+        <div class="max-h-[400px] overflow-y-auto pr-1">${detailedAnswersHTML || '<p class="text-gray-500 text-sm">No answer data.</p>'}</div>
+      </div>
+    ` : `<div class="bg-blue-50 p-4 rounded-xl border border-blue-100 text-sm text-blue-800 font-semibold">User visited the website but did not start/submit the test.</div>`}
+  `;
+  modal.classList.remove('hidden');
+  modal.classList.add('flex');
+};
+
+window.closeModal = function() {
+  const modal = document.getElementById('userModal');
+  modal.classList.add('hidden');
+  modal.classList.remove('flex');
+};
+window.onclick = function(event) {
+  const modal = document.getElementById('userModal');
+  if (event.target === modal) { window.closeModal(); }
+}
+</script>
+</body>
+</html>
